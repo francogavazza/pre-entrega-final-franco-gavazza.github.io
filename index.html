@@ -1,90 +1,282 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta name="description" content="Nuestro casamiento: toda la información, confirmación de asistencia y más.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="icon" href="./assets/img/Avión Circle Maniobra Logo Icono Plantilla De Diseño Gráfico Vectorial Descarga gratuita de plantilla en Pngtree.jfif">
-    <title>Empresa de viaje</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
+    <title>Sofía &amp; Martín · Nos casamos</title>
 </head>
 <body>
-    <header>
-        <div class="headerimg">
-          <!-- logo de la barra  de navegacion-->
-        <div class="logo">
-            <img src="./assets/img/Avión Circle Maniobra Logo Icono Plantilla De Diseño Gráfico Vectorial Descarga gratuita de plantilla en Pngtree.jfif" alt="logo de un avion, dando una vuelta">
-            <!--barra de navegacion-->
-            <nav class="navbar">
-              <!--links de barra (inicio, lugares, fotos, contacto)-->
-            <a href="#inicio" class="nav-link">inicio</a>
-            <a href="./pages/fotos.html" target="_blank" class="nav-link">fotos</a>
-            <a href="#fotos" class="nav-link">lugares</a>
-            <a href="./pages/contacto.html" target="_blank" class="nav-link">contacto</a>
-          </nav>
-    </div>
+    <!-- Pantalla de bienvenida (sobre) -->
+    <div class="sobre" id="sobre">
+        <div class="sobre__contenido">
+            <p class="sobre__intro">Estás invitado/a a nuestro casamiento</p>
+            <div class="sello" aria-hidden="true">S&amp;M</div>
+            <button class="btn btn--claro" id="abrir-invitacion">Abrir invitación</button>
         </div>
+    </div>
+
+    <canvas id="petalos" aria-hidden="true"></canvas>
+
+    <!-- Barra de navegación -->
+    <header class="header" id="header">
+        <a href="#inicio" class="header__logo">S <span>&amp;</span> M</a>
+        <button class="header__toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav" id="nav">
+            <a href="#inicio" class="nav__link">Inicio</a>
+            <a href="#historia" class="nav__link">Historia</a>
+            <a href="#evento" class="nav__link">Evento</a>
+            <a href="#fotos" class="nav__link">Fotos</a>
+            <a href="#regalos" class="nav__link">Regalos</a>
+            <a href="#rsvp" class="nav__link nav__link--destacado">Confirmar</a>
+        </nav>
     </header>
-    <!--link para volver a inicio-->
-    <div class="item" id="inicio">
+
+    <main>
+        <!-- Portada -->
+        <section class="hero" id="inicio">
+            <div class="hero__contenido">
+                <p class="hero__pre revelar">¡Nos casamos!</p>
+                <h1 class="hero__nombres revelar">Sofía <span>&amp;</span> Martín</h1>
+                <p class="hero__fecha revelar">Sábado 20 de marzo de 2027 · Buenos Aires</p>
+                <div class="cuenta revelar" id="cuenta-regresiva">
+                    <div class="cuenta__item"><span id="dias">0</span><small>días</small></div>
+                    <div class="cuenta__item"><span id="horas">0</span><small>horas</small></div>
+                    <div class="cuenta__item"><span id="minutos">0</span><small>minutos</small></div>
+                    <div class="cuenta__item"><span id="segundos">0</span><small>segundos</small></div>
+                </div>
+                <a href="#rsvp" class="btn revelar">Confirmar asistencia</a>
+            </div>
+            <a href="#historia" class="hero__scroll" aria-label="Bajar">⌄</a>
+        </section>
+
+        <!-- Nuestra historia -->
+        <section class="seccion" id="historia">
+            <p class="seccion__pre">Cómo empezó todo</p>
+            <h2 class="seccion__titulo">Nuestra historia</h2>
+            <div class="linea-tiempo">
+                <article class="hito revelar">
+                    <span class="hito__icono">☕</span>
+                    <div class="hito__tarjeta">
+                        <time>Abril 2018</time>
+                        <h3>Nos conocimos</h3>
+                        <p>Un café compartido por error en la facultad terminó siendo la charla más larga de nuestras vidas.</p>
+                    </div>
+                </article>
+                <article class="hito revelar">
+                    <span class="hito__icono">✈️</span>
+                    <div class="hito__tarjeta">
+                        <time>Enero 2020</time>
+                        <h3>Primer viaje juntos</h3>
+                        <p>Mochila al hombro por la Patagonia: descubrimos que también somos un gran equipo de viaje.</p>
+                    </div>
+                </article>
+                <article class="hito revelar">
+                    <span class="hito__icono">🏡</span>
+                    <div class="hito__tarjeta">
+                        <time>Marzo 2022</time>
+                        <h3>Nuestro hogar</h3>
+                        <p>Nos mudamos juntos con dos cajas de libros, una planta y muchas ganas.</p>
+                    </div>
+                </article>
+                <article class="hito revelar">
+                    <span class="hito__icono">💍</span>
+                    <div class="hito__tarjeta">
+                        <time>Diciembre 2025</time>
+                        <h3>¡Dijo que sí!</h3>
+                        <p>Bajo las estrellas, frente al lago, llegó la pregunta más fácil de responder.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Ceremonia y fiesta -->
+        <section class="seccion seccion--alterna" id="evento">
+            <p class="seccion__pre">Cuándo y dónde</p>
+            <h2 class="seccion__titulo">El gran día</h2>
+            <div class="tarjetas">
+                <article class="tarjeta revelar">
+                    <span class="tarjeta__icono">⛪</span>
+                    <h3>Ceremonia</h3>
+                    <p class="tarjeta__hora">17:00 hs</p>
+                    <p>Parroquia Nuestra Señora del Pilar<br>Junín 1904, Recoleta, CABA</p>
+                    <div class="tarjeta__acciones">
+                        <a class="btn btn--chico" href="https://www.google.com/maps/search/?api=1&query=Basilica+Nuestra+Senora+del+Pilar+Junin+1904+CABA" target="_blank" rel="noopener">Ver mapa</a>
+                        <button class="btn btn--chico btn--borde" data-calendario="ceremonia">Agendar</button>
+                    </div>
+                </article>
+                <article class="tarjeta revelar">
+                    <span class="tarjeta__icono">🥂</span>
+                    <h3>Fiesta</h3>
+                    <p class="tarjeta__hora">20:00 hs</p>
+                    <p>Salón Los Jazmines<br>Av. del Libertador 4500, Palermo, CABA</p>
+                    <div class="tarjeta__acciones">
+                        <a class="btn btn--chico" href="https://www.google.com/maps/search/?api=1&query=Av.+del+Libertador+4500+CABA" target="_blank" rel="noopener">Ver mapa</a>
+                        <button class="btn btn--chico btn--borde" data-calendario="fiesta">Agendar</button>
+                    </div>
+                </article>
+                <article class="tarjeta revelar">
+                    <span class="tarjeta__icono">👗</span>
+                    <h3>Dress code</h3>
+                    <p class="tarjeta__hora">Elegante</p>
+                    <p>Te pedimos evitar el color blanco, ¡ese se lo dejamos a la novia!</p>
+                    <div class="paleta" aria-label="Paleta de colores sugerida">
+                        <span style="--c:#8a9a7b"></span>
+                        <span style="--c:#c9a27e"></span>
+                        <span style="--c:#d8b4a6"></span>
+                        <span style="--c:#5d6b7a"></span>
+                        <span style="--c:#7b4b52"></span>
+                    </div>
+                </article>
+            </div>
+
+            <h3 class="subtitulo revelar">Itinerario</h3>
+            <ol class="itinerario">
+                <li class="revelar"><strong>17:00</strong> Ceremonia religiosa</li>
+                <li class="revelar"><strong>20:00</strong> Recepción y cóctel</li>
+                <li class="revelar"><strong>21:30</strong> Entrada de los novios y cena</li>
+                <li class="revelar"><strong>23:00</strong> Vals y apertura de pista</li>
+                <li class="revelar"><strong>04:00</strong> Fin de fiesta</li>
+            </ol>
+        </section>
+
+        <!-- Galería -->
+        <section class="seccion" id="fotos">
+            <p class="seccion__pre">Momentos</p>
+            <h2 class="seccion__titulo">Nuestras fotos</h2>
+            <div class="galeria" id="galeria"></div>
+        </section>
+
+        <!-- Regalos -->
+        <section class="seccion seccion--alterna" id="regalos">
+            <p class="seccion__pre">Mesa de regalos</p>
+            <h2 class="seccion__titulo">Regalos</h2>
+            <p class="seccion__texto revelar">Tu presencia es nuestro mejor regalo. Si además querés ayudarnos con nuestra luna de miel, te dejamos nuestros datos.</p>
+            <div class="regalo revelar">
+                <div class="regalo__fila">
+                    <span>Alias</span>
+                    <strong id="dato-alias">SOFI.MARTIN.BODA</strong>
+                    <button class="copiar" data-copiar="dato-alias">Copiar</button>
+                </div>
+                <div class="regalo__fila">
+                    <span>CBU</span>
+                    <strong id="dato-cbu">0000003100012345678901</strong>
+                    <button class="copiar" data-copiar="dato-cbu">Copiar</button>
+                </div>
+                <div class="regalo__fila">
+                    <span>Titular</span>
+                    <strong>Sofía Pérez</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Confirmación -->
+        <section class="seccion" id="rsvp">
+            <p class="seccion__pre">Esperamos tu respuesta antes del 20 de febrero</p>
+            <h2 class="seccion__titulo">Confirmá tu asistencia</h2>
+            <form class="formulario revelar" id="form-rsvp" novalidate>
+                <div class="campo">
+                    <label for="nombre">Nombre y apellido</label>
+                    <input type="text" id="nombre" name="nombre" required autocomplete="name">
+                    <small class="campo__error"></small>
+                </div>
+                <div class="campo">
+                    <span class="campo__etiqueta">¿Vas a venir?</span>
+                    <div class="opciones">
+                        <label class="opcion"><input type="radio" name="asistencia" value="si" required><span>¡Sí, voy! 🎉</span></label>
+                        <label class="opcion"><input type="radio" name="asistencia" value="no"><span>No puedo 😢</span></label>
+                    </div>
+                    <small class="campo__error"></small>
+                </div>
+                <div class="campo campo--si">
+                    <label for="invitados">Cantidad de personas</label>
+                    <div class="contador">
+                        <button type="button" data-paso="-1" aria-label="Restar">−</button>
+                        <input type="number" id="invitados" name="invitados" value="1" min="1" max="6" readonly>
+                        <button type="button" data-paso="1" aria-label="Sumar">+</button>
+                    </div>
+                </div>
+                <div class="campo campo--si">
+                    <label for="menu">Menú</label>
+                    <select id="menu" name="menu">
+                        <option>Estándar</option>
+                        <option>Vegetariano</option>
+                        <option>Vegano</option>
+                        <option>Sin TACC</option>
+                    </select>
+                </div>
+                <div class="campo campo--si">
+                    <label for="cancion">¿Qué canción no puede faltar?</label>
+                    <input type="text" id="cancion" name="cancion" placeholder="Tema y artista">
+                </div>
+                <div class="campo">
+                    <label for="mensaje">Mensaje para los novios</label>
+                    <textarea id="mensaje" name="mensaje" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Enviar confirmación</button>
+            </form>
+            <div class="confirmacion" id="confirmacion" hidden>
+                <span class="confirmacion__icono">💌</span>
+                <h3 id="confirmacion-titulo">¡Gracias!</h3>
+                <p id="confirmacion-texto"></p>
+                <div class="tarjeta__acciones">
+                    <a class="btn btn--chico" id="enviar-whatsapp" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+                    <button class="btn btn--chico btn--borde" id="editar-rsvp">Editar respuesta</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preguntas frecuentes -->
+        <section class="seccion seccion--alterna" id="faq">
+            <p class="seccion__pre">Dudas</p>
+            <h2 class="seccion__titulo">Preguntas frecuentes</h2>
+            <div class="faq">
+                <details class="revelar">
+                    <summary>¿Puedo llevar a mis hijos?</summary>
+                    <p>¡Claro! Los más chicos son bienvenidos. Indicalos en la cantidad de personas al confirmar.</p>
+                </details>
+                <details class="revelar">
+                    <summary>¿Hay estacionamiento?</summary>
+                    <p>Sí, el salón cuenta con estacionamiento gratuito con valet parking.</p>
+                </details>
+                <details class="revelar">
+                    <summary>¿Cómo llego de la iglesia al salón?</summary>
+                    <p>Vamos a tener una combi que sale desde la parroquia a las 19:15 hs.</p>
+                </details>
+                <details class="revelar">
+                    <summary>¿Hasta cuándo puedo confirmar?</summary>
+                    <p>Hasta el 20 de febrero de 2027. ¡Nos ayuda mucho para la organización!</p>
+                </details>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p class="footer__nombres">Sofía &amp; Martín</p>
+        <p>20 · 03 · 2027</p>
+        <p class="footer__hashtag">#SofiYMartinSeCasan</p>
+    </footer>
+
+    <!-- Visor de fotos -->
+    <div class="visor" id="visor" hidden>
+        <button class="visor__cerrar" aria-label="Cerrar">×</button>
+        <button class="visor__nav visor__nav--prev" aria-label="Anterior">‹</button>
+        <figure>
+            <div class="visor__img" id="visor-img"></div>
+            <figcaption id="visor-texto"></figcaption>
+        </figure>
+        <button class="visor__nav visor__nav--next" aria-label="Siguiente">›</button>
     </div>
-    <!--foto fija principal-->
-    <section id="foto-principal">
-        <div class="img-principal"></div>
-    </section>
-    <div class="item" id="fotos">
-        <h2> conoce nuestros lugares </h2>
-    </div>
-    <!-- todas las imagenes de grid-->
-    <div class="imagen-grid">
-        <div class="grid-item" style="background: url(./assets/img/9.jfif);">Montañas Rocosas, Estados Unidos y Canadá</div>
-        <div class="grid-item" style="background: url(./assets/img/2.jfif);">Alpes, Europa</div>
-        <div class="grid-item" style="background: url(./assets/img/3.jfif);">Patagonia, Argentina y Chile</div>
-        <div class="grid-item" style="background: url(./assets/img/7.jfif);">Montañas del Atlas, Marruecos</div>
-        <div class="grid-item" style="background: url(./assets/img/2.jfif);">Montañas de los Cárpatos, Europa Central y Oriental</div>
-        <div class="grid-item" style="background: url(./assets/img/2.jfif);">Montañas de los Cárpatos, Europa Central y Oriental</div>
-        <div class="grid-item" style="background: url(./assets/img/7.jfif);">Selva Negra, Alemania</div>
-        <div class="grid-item" style="background: url(./assets/img/7.jfif);">Selva Negra, Alemania</div>
-        <div class="grid-item" style="background: url(./assets/img/7.jfif);">Montañas Blue Ridge, Estados Unidos</div>
-        <div class="grid-item" style="background: url(./assets/img/3.jfif);">Parque Nacional de Banff, Canadá</div>
-        <div class="grid-item" style="background: url(./assets/img/9.jfif);">Parque Nacional de Yosemite, Estados Unidos</div>
-        <div class="grid-item" style="background: url(./assets/img/3.jfif);">Cordillera de los Andes, América del Sur</div>
-    </div>
-    <div class="item" id="carousel">
-        <h2> viaja con nosotros </h2>
-    </div>
-      <!-- escritura final -->
-      <footer>
-        <div class="imagen-footer">
-          <img src="./assets/img/Scrapbooking Daily.jfif" alt="mapa con libro de fotos y ubicaciones">
-        </div>
-        <ul>
-          <li>🌍 Viaja seguro con nuestra empresa</li>
-          <li>🌍 Viaja con nosotros </li>
-          <li>🌍 Viaja feliz con nuestro servicio </li>
-          <li>🌍 Viaja tranquilo </li>
-        </ul>
-      </footer>
-      
-      <section id="buttons-final-1">
-          <div class="imagen-button-1">
-            <img src="./assets/img/CUPONES DESCUENTO DE VIAJES - OM VIAJES Y RELATOS.jfif" alt="Imagen de un mapra con un cafe arriba y una camara">
-          <a href="./pages/historia.html" target="_blank" >nuestra historia</a>
-        </div>
-        <div class="imagen-button-2">
-          <img src="./assets/img/Fotos que puedes tomarte en un viaje largo en avión.jfif" alt="foto de una persona con cafe y el pasaporte en las piernas">
-        <a href="./pages/clientes.html" target="_blank" >clientes</a>
-      </div>
-        <div class="imagen-button-3">
-          <img src="./assets/img/28 sugestões de legendas para fotos de viagem.jfif" alt="ventanilla de avion, con una mano agarrando un libro">
-        <a href="./pages/+clientes.html" target="_blank" >+clientes</a>
-      </div>
-    </section>
-      
-      
-      <section id="marca">
-        <p>&copy; empresa de viaje</p>
-      </section>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <div class="aviso" id="aviso" role="status"></div>
+
+    <script src="./js/main.js"></script>
 </body>
 </html>
