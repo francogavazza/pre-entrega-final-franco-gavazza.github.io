@@ -425,19 +425,19 @@
   var petalRunning = false;
 
   function resizePetals() {
-    var dpr = window.devicePixelRatio || 1;
-    petalCanvas.width = window.innerWidth * dpr;
-    petalCanvas.height = window.innerHeight * dpr;
+    // Resolución limitada: los pétalos se ven igual y el celular trabaja mucho menos
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    petalCanvas.width = Math.round(window.innerWidth * dpr);
+    petalCanvas.height = Math.round(window.innerHeight * dpr);
     petalCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   function nuevoPetalo(arriba) {
-    var size = 11 + Math.random() * 11;
     petals.push({
       x: Math.random() * window.innerWidth,
       y: arriba ? -20 - Math.random() * 60 : -Math.random() * window.innerHeight * 0.6,
-      size: size,
-      vy: 38 + Math.random() * 46,
+      size: 11 + Math.random() * 11,
+      vy: 70 + Math.random() * 60,
       sway: 18 + Math.random() * 30,
       swaySpeed: 0.8 + Math.random() * 1.2,
       phase: Math.random() * Math.PI * 2,
@@ -445,24 +445,25 @@
       vrot: (Math.random() - 0.5) * 1.6,
       flip: Math.random() * Math.PI * 2,
       vflip: 1.5 + Math.random() * 2.5,
-      tint: Math.random()
+      sprite: Math.random() < 0.5 ? 0 : 1
     });
   }
 
-  // Un pétalo de rosa: redondeado, con una muesca arriba y la base angosta
-  function dibujarPetalo(p) {
-    var s = p.size;
-    var ctx = petalCtx;
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot);
-    ctx.scale(Math.max(0.15, Math.abs(Math.cos(p.flip))), 1);
+  // Un pétalo de rosa (redondeado, con una muesca arriba y la base angosta) dibujado una sola vez
+  // en dos tonos; en cada cuadro solo se copia la imagen girada, sin recalcular sombra ni degradado.
+  var PETAL_PX = 64;
+  function crearSpritePetalo(medio, borde) {
+    var cv = document.createElement("canvas");
+    cv.width = cv.height = PETAL_PX;
+    var ctx = cv.getContext("2d");
+    var s = PETAL_PX * 0.42;
+    ctx.translate(PETAL_PX / 2, PETAL_PX / 2 - 2);
     var g = ctx.createRadialGradient(-s * 0.15, -s * 0.2, s * 0.1, 0, 0, s);
     g.addColorStop(0, "#FFFFFF");
-    g.addColorStop(0.6, p.tint > 0.5 ? "#FBF6F1" : "#FDF8F8");
-    g.addColorStop(1, p.tint > 0.5 ? "#EADFD3" : "#F2E2E0");
+    g.addColorStop(0.6, medio);
+    g.addColorStop(1, borde);
     ctx.fillStyle = g;
-    ctx.shadowColor = "rgba(120, 95, 70, .18)";
+    ctx.shadowColor = "rgba(120, 95, 70, .2)";
     ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 2;
     ctx.beginPath();
@@ -474,13 +475,24 @@
     ctx.fill();
     ctx.shadowColor = "transparent";
     ctx.strokeStyle = "rgba(205, 185, 165, .35)";
-    ctx.lineWidth = 0.6;
+    ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.moveTo(0, s * 0.55);
     ctx.quadraticCurveTo(s * 0.05, 0, 0, -s * 0.35);
     ctx.stroke();
-    ctx.restore();
+    return cv;
   }
+  var petalSprites = null;
+
+  function dibujarPetalo(p) {
+    var k = p.size / (PETAL_PX * 0.42);
+    var cos = Math.cos(p.rot);
+    var sin = Math.sin(p.rot);
+    var sx = Math.max(0.15, Math.abs(Math.cos(p.flip))) * k;
+    petalCtx.setTransform(cos * sx * petalScale, sin * sx * petalScale, -sin * k * petalScale, cos * k * petalScale, p.x * petalScale, p.y * petalScale);
+    petalCtx.drawImage(petalSprites[p.sprite], -PETAL_PX / 2, -PETAL_PX / 2);
+  }
+  var petalScale = 1;
 
   var petalLast = 0;
   var petalSpawn = 0;
@@ -491,7 +503,8 @@
       petalSpawn += dt * 6;
       while (petalSpawn >= 1) { nuevoPetalo(true); petalSpawn--; }
     }
-    petalCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    petalCtx.setTransform(1, 0, 0, 1, 0, 0);
+    petalCtx.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
     for (var i = petals.length - 1; i >= 0; i--) {
       var p = petals[i];
       p.phase += p.swaySpeed * dt;
@@ -508,16 +521,22 @@
 
   function lanzarPetalos() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!petalSprites) petalSprites = [crearSpritePetalo("#FBF6F1", "#EADFD3"), crearSpritePetalo("#FDF8F8", "#F2E2E0")];
     resizePetals();
+    petalScale = petalCanvas.width / window.innerWidth;
     petalCanvas.hidden = false;
-    for (var i = 0; i < 35; i++) nuevoPetalo(false);
-    petalUntil = performance.now() + 8000;
+    for (var i = 0; i < 30; i++) nuevoPetalo(false);
+    petalUntil = performance.now() + 6000;
     if (!petalRunning) {
       petalRunning = true;
       petalLast = 0;
       requestAnimationFrame(animarPetalos);
     }
   }
-  window.addEventListener("resize", function () { if (petalRunning) resizePetals(); });
+  window.addEventListener("resize", function () {
+    if (!petalRunning) return;
+    resizePetals();
+    petalScale = petalCanvas.width / window.innerWidth;
+  });
 
 })();
