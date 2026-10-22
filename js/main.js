@@ -1,6 +1,7 @@
 (function () {
   // ===== Datos de la boda (editar acá) =====
   var MUSIC_SRC = "./assets/boda/einaudi-experience.mp3"; // "Experience", Ludovico Einaudi (en vivo desde el Teatro dal Verme, Milán)
+  var MUSIC_START = 110; // segundo en el que arranca la canción (1:50), también al repetirse
   var TARGET = new Date(2027, 0, 21, 0, 0, 0); // cuenta regresiva hasta el 21/01/2027 a las 00:00
   // Número de WhatsApp que recibe las confirmaciones cuando la página está en GitHub Pages
   // (sin + ni espacios, ej.: "5492914000000"). Vacío: el invitado elige a quién mandarlo.
@@ -17,7 +18,12 @@
   var musicBtn = $("music-btn");
   var musicOn = false;
 
-  audio.src = MUSIC_SRC;
+  audio.loop = false;
+  audio.src = MUSIC_SRC + "#t=" + MUSIC_START;
+  audio.addEventListener("ended", function () {
+    audio.currentTime = MUSIC_START;
+    audio.play().catch(function () {});
+  });
   musicBtn.hidden = false;
 
   function setMusic(on) {
