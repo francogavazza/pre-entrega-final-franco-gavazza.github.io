@@ -256,10 +256,8 @@ a {
   color: var(--blanco);
   padding: 6rem 1rem 4rem;
   background:
-    linear-gradient(rgba(40, 32, 26, 0.45), rgba(40, 32, 26, 0.55)),
-    radial-gradient(ellipse at 20% 20%, #d8b4a6 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 80%, #8a9a7b 0%, transparent 55%),
-    linear-gradient(135deg, #c9a27e, #7b4b52);
+    linear-gradient(rgba(20, 18, 16, 0.35), rgba(20, 18, 16, 0.55)),
+    url("../assets/img/descarga.jfif") center / cover no-repeat;
   background-attachment: fixed;
 }
 
