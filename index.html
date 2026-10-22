@@ -94,15 +94,24 @@
   <section>
     <form class="arch" id="rsvp" novalidate>
       <div class="arch-inner form">
+        <h2 class="title">Confirmar asistencia</h2>
+        <p class="rsvp-event">Ceremonia y cena<span>22 de enero · 20:00 · Río Colorado</span></p>
+
         <div class="field">
-          <label for="hogar">Nombre y apellido de cada persona que va a asistir</label>
+          <label for="hogar">Nombre y apellido de cada persona</label>
           <textarea id="hogar" name="hogar" rows="4" maxlength="600" placeholder="Ej.: Franco Gavazza"></textarea>
         </div>
 
-
+        <fieldset class="field answer">
+          <legend class="lbl">¿Asisten a la ceremonia y cena?</legend>
+          <div class="answer-opts">
+            <label><input type="radio" name="asiste" value="si"><span>Sí, asistimos</span></label>
+            <label><input type="radio" name="asiste" value="no"><span>No podremos asistir</span></label>
+          </div>
+        </fieldset>
 
         <div class="submit">
-          <button class="btn solid" type="submit" id="send" disabled>Confirmar asistencia</button>
+          <button class="btn solid" type="submit" id="send" disabled>Enviar respuesta</button>
           <p class="status" id="status" role="alert"></p>
         </div>
 
@@ -176,7 +185,7 @@
   </div>
   <div class="admin-wrap">
     <table class="admin-table">
-      <thead><tr><th>Nombre y apellido</th><th>Personas</th><th>Actualizado</th></tr></thead>
+      <thead><tr><th>Nombre y apellido</th><th>Asiste</th><th>Personas</th><th>Actualizado</th></tr></thead>
       <tbody id="admin-rows"></tbody>
     </table>
   </div>
