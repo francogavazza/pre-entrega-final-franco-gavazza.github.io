@@ -81,11 +81,20 @@
     });
   });
 
-  // ===== Confirmación de asistencia =====
+  // ===== Confirmación de asistencia (ceremonia y cena; el civil no se confirma) =====
   // Una persona por cada línea escrita
   function countPeople() {
     return $("hogar").value.split("\n").filter(function (l) { return l.trim().length > 0; }).length;
   }
+  function getAnswer() {
+    var checked = document.querySelector('input[name="asiste"]:checked');
+    return checked ? checked.value : "";
+  }
+  function setAnswer(value) {
+    var input = document.querySelector('input[name="asiste"][value="' + value + '"]');
+    if (input) input.checked = true;
+  }
+  function plural(n) { return n + (n === 1 ? " persona" : " personas"); }
 
   function setStatus(msg, isErr) {
     var s = $("status");
@@ -93,16 +102,22 @@
     s.className = "status" + (isErr ? " err" : "");
   }
 
-  function showDone(count) {
+  function showDone(count, asiste) {
     $("send").textContent = "Cambiar respuesta";
     $("done").classList.add("show");
-    $("done-msg").textContent = "Anotamos tu respuesta para " + count + (count === 1 ? " persona." : " personas.");
+    $("done-msg").textContent = asiste === "no"
+      ? "Anotamos que no van a poder asistir. ¡Gracias por avisarnos!"
+      : "Anotamos tu respuesta para " + plural(count) + " en la ceremonia y cena.";
   }
 
   function validate() {
     if ($("hogar").value.trim().length < 3) {
-      setStatus("Escribí el nombre y apellido de cada persona que va a asistir.", true);
+      setStatus("Escribí el nombre y apellido de cada persona.", true);
       $("hogar").focus();
+      return false;
+    }
+    if (!getAnswer()) {
+      setStatus("Elegí si asisten o no a la ceremonia y cena.", true);
       return false;
     }
     setStatus("");
@@ -116,14 +131,20 @@
     if (!validate()) return;
     if (!db || !uid) { setStatus("Para confirmar necesitás iniciar sesión.", true); return; }
     var count = countPeople();
+    var asiste = getAnswer();
     var btn = $("send");
     btn.disabled = true;
     setStatus("Guardando…");
-    db.doc("rsvp/" + uid).set({ hogar: $("hogar").value.trim(), personas: count, actualizado: new Date().toISOString() })
+    db.doc("rsvp/" + uid).set({
+      hogar: $("hogar").value.trim(),
+      asiste: asiste,
+      personas: asiste === "si" ? count : 0,
+      actualizado: new Date().toISOString()
+    })
       .then(function () {
         setStatus("");
         btn.disabled = false;
-        showDone(count);
+        showDone(count, asiste);
       })
       .catch(function (err) {
         btn.disabled = false;
@@ -136,11 +157,13 @@
   function submitStatic() {
     if (!validate()) return;
     var count = countPeople();
+    var asiste = getAnswer();
     var names = $("hogar").value.trim();
-    var text = "¡Hola Fran y Sofi! Confirmo asistencia al casamiento para " + count +
-      (count === 1 ? " persona" : " personas") + ":\n" + names;
-    try { localStorage.setItem("rsvp-fran-sofi", names); } catch (e) {}
-    showDone(count);
+    var text = asiste === "si"
+      ? "¡Hola Fran y Sofi! Confirmamos asistencia a la ceremonia y cena del 22 de enero (" + plural(count) + "):\n" + names
+      : "¡Hola Fran y Sofi! Lamentablemente no vamos a poder asistir a la ceremonia y cena del 22 de enero:\n" + names;
+    try { localStorage.setItem("rsvp-fran-sofi", JSON.stringify({ hogar: names, asiste: asiste })); } catch (e) {}
+    showDone(count, asiste);
     window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(text), "_blank", "noopener");
   }
 
@@ -158,8 +181,10 @@
         db.doc("rsvp/" + uid).onSnapshot(function (snap) {
           if (snap.exists && !$("hogar").value) {
             var data = snap.data() || {};
+            var asiste = data.asiste || "si";
             $("hogar").value = data.hogar || "";
-            showDone(Number(data.personas) || countPeople());
+            setAnswer(asiste);
+            showDone(countPeople(), asiste);
           }
         }, function () {});
       });
@@ -168,8 +193,12 @@
     $("send").disabled = false;
     $("send").addEventListener("click", function (e) { e.preventDefault(); submitStatic(); });
     try {
-      var saved = localStorage.getItem("rsvp-fran-sofi");
-      if (saved) { $("hogar").value = saved; showDone(countPeople()); }
+      var saved = JSON.parse(localStorage.getItem("rsvp-fran-sofi"));
+      if (saved && saved.hogar) {
+        $("hogar").value = saved.hogar;
+        setAnswer(saved.asiste);
+        showDone(countPeople(), saved.asiste);
+      }
     } catch (e) {}
   }
   $("rsvp").addEventListener("submit", function (e) { e.preventDefault(); });
@@ -222,7 +251,7 @@
   function renderAdmin(docs) {
     adminRows = docs.map(function (d) {
       var x = d.data() || {};
-      return { hogar: String(x.hogar || ""), personas: Number(x.personas) || 0, actualizado: String(x.actualizado || "") };
+      return { hogar: String(x.hogar || ""), asiste: x.asiste === "no" ? "No" : "Sí", personas: Number(x.personas) || 0, actualizado: String(x.actualizado || "") };
     }).sort(function (a, b) { return a.actualizado < b.actualizado ? 1 : -1; });
     var people = 0;
     adminRows.forEach(function (r) { people += r.personas; });
@@ -233,7 +262,7 @@
     tbody.textContent = "";
     adminRows.forEach(function (r) {
       var tr = document.createElement("tr");
-      [r.hogar.replace(/\n/g, ", "), String(r.personas), fmtDate(r.actualizado)].forEach(function (t) {
+      [r.hogar.replace(/\n/g, ", "), r.asiste, String(r.personas), fmtDate(r.actualizado)].forEach(function (t) {
         var td = document.createElement("td");
         td.textContent = t;
         tr.appendChild(td);
@@ -245,9 +274,9 @@
   function csvCell(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }
   // Excel en español abre el CSV con punto y coma; el BOM mantiene las tildes
   function downloadCsv() {
-    var lines = [["Nombre y apellido", "Personas", "Actualizado"].map(csvCell).join(";")];
+    var lines = [["Nombre y apellido", "Asiste", "Personas", "Actualizado"].map(csvCell).join(";")];
     adminRows.forEach(function (r) {
-      lines.push([r.hogar.replace(/\n/g, ", "), r.personas, r.actualizado].map(csvCell).join(";"));
+      lines.push([r.hogar.replace(/\n/g, ", "), r.asiste, r.personas, r.actualizado].map(csvCell).join(";"));
     });
     var data = "﻿" + lines.join("\r\n");
     window.claude.use("downloads").then(function (api) {
