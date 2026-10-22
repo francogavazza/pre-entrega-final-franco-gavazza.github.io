@@ -8,6 +8,9 @@
   var WHATSAPP = "5492931420208";
   // Link de la invitación publicada en Claude (ahí las confirmaciones se guardan en su base)
   var ARTIFACT_URL = "https://claude.ai/artifact/EhYXrakUV9p9SFZaMFQmXk";
+  // Planilla de Google donde se anotan todas las confirmaciones (URL de la app web de Apps Script,
+  // ver planilla/README.md). Vacío: en GitHub Pages las confirmaciones se mandan por WhatsApp.
+  var SHEET_URL = "";
 
   var $ = function (id) { return document.getElementById(id); };
   var hasClaude = !!(window.claude && window.claude.use);
@@ -151,6 +154,7 @@
         setStatus("");
         btn.disabled = false;
         showDone(count, asiste);
+        sendToSheet("claude-" + uid, asiste, count);
       })
       .catch(function (err) {
         btn.disabled = false;
@@ -159,18 +163,63 @@
       });
   }
 
-  // En GitHub Pages (sin base de datos): se arma el mensaje y se manda por WhatsApp
+  // Anota la respuesta en la planilla de Google. Cada dispositivo tiene un id, así si alguien
+  // cambia su respuesta se actualiza su misma fila en vez de agregar otra.
+  function deviceId() {
+    try {
+      var id = localStorage.getItem("rsvp-id");
+      if (!id) {
+        id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        localStorage.setItem("rsvp-id", id);
+      }
+      return id;
+    } catch (e) { return "sin-id-" + Date.now().toString(36); }
+  }
+  function sendToSheet(id, asiste, count) {
+    if (!SHEET_URL) return Promise.resolve(false);
+    var data = {
+      id: id,
+      nombres: $("hogar").value.trim().split("\n").map(function (l) { return l.trim(); }).filter(Boolean).join(", "),
+      asiste: asiste === "si" ? "Sí" : "No",
+      personas: asiste === "si" ? count : 0,
+      invitacion: $("guest-names").hidden ? "" : $("guest-names").textContent
+    };
+    // text/plain evita el preflight de CORS; la respuesta de Google no se puede leer (no-cors)
+    return fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
+      .then(function () { return true; }, function () { return false; });
+  }
+
+  function sendWhatsApp(asiste, count, names) {
+    var text = asiste === "si"
+      ? "¡Hola Fran y Sofi! Confirmamos asistencia a la ceremonia y cena del 22 de enero (" + plural(count) + "):\n" + names
+      : "¡Hola Fran y Sofi! Lamentablemente no vamos a poder asistir a la ceremonia y cena del 22 de enero:\n" + names;
+    window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(text), "_blank", "noopener");
+  }
+
+  // En GitHub Pages (sin base de datos): se anota en la planilla o, si no hay planilla, se manda por WhatsApp
   function submitStatic() {
     if (!validate()) return;
     var count = countPeople();
     var asiste = getAnswer();
     var names = $("hogar").value.trim();
-    var text = asiste === "si"
-      ? "¡Hola Fran y Sofi! Confirmamos asistencia a la ceremonia y cena del 22 de enero (" + plural(count) + "):\n" + names
-      : "¡Hola Fran y Sofi! Lamentablemente no vamos a poder asistir a la ceremonia y cena del 22 de enero:\n" + names;
     try { localStorage.setItem("rsvp-fran-sofi", JSON.stringify({ hogar: names, asiste: asiste })); } catch (e) {}
-    showDone(count, asiste);
-    window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(text), "_blank", "noopener");
+    if (!SHEET_URL) {
+      showDone(count, asiste);
+      sendWhatsApp(asiste, count, names);
+      return;
+    }
+    var btn = $("send");
+    btn.disabled = true;
+    setStatus("Enviando…");
+    sendToSheet(deviceId(), asiste, count).then(function (ok) {
+      btn.disabled = false;
+      if (ok) {
+        setStatus("");
+        showDone(count, asiste);
+      } else {
+        setStatus("No se pudo enviar. Revisá la conexión e intentá de nuevo.", true);
+      }
+    });
   }
 
   if (hasClaude) {
