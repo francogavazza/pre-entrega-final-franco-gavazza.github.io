@@ -1,6 +1,6 @@
 (function () {
   // ===== Datos de la boda (editar acá) =====
-  var MUSIC_SRC = "./assets/boda/musica.mp3"; // El Danubio Azul, Johann Strauss (dominio público), vals de cuento
+  var MUSIC_SRC = "./assets/boda/einaudi-experience.mp3"; // "Experience", Ludovico Einaudi (en vivo desde el Teatro dal Verme, Milán)
   var TARGET = new Date(2027, 0, 21, 0, 0, 0); // cuenta regresiva hasta el 21/01/2027 a las 00:00
   // Número de WhatsApp que recibe las confirmaciones cuando la página está en GitHub Pages
   // (sin + ni espacios, ej.: "5492914000000"). Vacío: el invitado elige a quién mandarlo.
