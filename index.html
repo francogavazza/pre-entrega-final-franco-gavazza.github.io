@@ -191,42 +191,15 @@
   </div>
 </section>
 
-<!-- Pajarito con una cartita que acompaña la carta y cada título -->
+<!-- Lechuza con un pergamino que acompaña la carta y cada título: la foto se divide en
+     ala izquierda, ala derecha y cuerpo para que las alas puedan aletear -->
 <div class="pajarito" id="pajarito" aria-hidden="true">
   <div class="pajarito-vuelo">
-    <svg viewBox="0 0 200 140">
-      <defs>
-        <linearGradient id="pj-cuerpo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#F1EEE8"/><stop offset="1" stop-color="#D9D3C9"/></linearGradient>
-        <linearGradient id="pj-ala" x1="0" y1="1" x2=".6" y2="0"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F4F1EC"/><stop offset="1" stop-color="#DCD6CC"/></linearGradient>
-        <linearGradient id="pj-ala-atras" x1="0" y1="1" x2=".6" y2="0"><stop offset="0" stop-color="#E4DFD6"/><stop offset="1" stop-color="#C9C2B6"/></linearGradient>
-        <radialGradient id="pj-cuello" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#E9E2EC" stop-opacity=".9"/><stop offset="1" stop-color="#E9E2EC" stop-opacity="0"/></radialGradient>
-      </defs>
-      <g class="ala ala-atras"><path d="M84 64 C86 44 100 22 124 6 C130 3 135 5 132 10 C140 7 145 12 140 17 C148 15 152 20 146 25 C153 24 157 29 150 33 C157 35 157 41 150 43 C140 51 126 59 112 64 C102 68 90 68 84 64 Z" transform="translate(-10 3) rotate(-6 84 64)" fill="url(#pj-ala-atras)" stroke="#B9B1A4" stroke-width=".8"/></g>
-      <g class="cuerpo">
-        <path d="M140 74 C158 68 178 64 195 68 C198 75 196 84 191 92 C176 93 157 90 142 85 Z" fill="url(#pj-cuerpo)" stroke="#C4BCAF" stroke-width=".8"/>
-        <path d="M146 76 L193 74 M146 80 L194 82 M145 84 L190 89" stroke="#CFC8BC" stroke-width=".7" fill="none"/>
-        <path d="M52 60 C60 47 84 44 106 50 C126 55 140 66 150 77 C138 88 116 95 92 95 C70 95 55 86 50 75 C48 70 49 65 52 60 Z" fill="url(#pj-cuerpo)" stroke="#C4BCAF" stroke-width=".8"/>
-        <path d="M74 92 l-3 7 M80 94 l-1 7" stroke="#C98E86" stroke-width="2" stroke-linecap="round"/>
-        <path d="M36 54 C37 43 49 37 58 42 C66 46 68 58 62 66 C57 72 45 71 40 65 C37 62 36 58 36 54 Z" fill="url(#pj-cuerpo)" stroke="#C4BCAF" stroke-width=".8"/>
-        <ellipse cx="60" cy="64" rx="11" ry="8" fill="url(#pj-cuello)"/>
-        <path d="M37 53 L25 56.5 L36.5 59 Z" fill="#D6A39A" stroke="#A9746C" stroke-width=".6" stroke-linejoin="round"/>
-        <path d="M34 52.2 q2.5 -1.6 4.4 .4" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
-        <circle cx="44.5" cy="50.5" r="3.1" fill="#3A2A22"/>
-        <circle cx="44.5" cy="50.5" r="3.9" fill="none" stroke="#C9A089" stroke-width=".7"/>
-        <circle cx="45.6" cy="49.4" r="1" fill="#FFFFFF"/>
-        <g class="cartita" transform="translate(4 55) rotate(-9)">
-          <rect x="0" y="0" width="24" height="16" rx="1.2" fill="#FFFDF8" stroke="#B08A3A" stroke-width="1"/>
-          <path d="M.6 .6 L12 9 L23.4 .6" fill="none" stroke="#B08A3A" stroke-width=".9"/>
-          <path d="M12 13.8 C7.4 10.8 6.6 8.2 9 7.1 C10.6 6.5 11.6 7.4 12 8.2 C12.4 7.4 13.4 6.5 15 7.1 C17.4 8.2 16.6 10.8 12 13.8 Z" fill="#C0545F"/>
-        </g>
-      </g>
-      <g class="ala ala-adelante">
-        <path d="M84 64 C86 44 100 22 124 6 C130 3 135 5 132 10 C140 7 145 12 140 17 C148 15 152 20 146 25 C153 24 157 29 150 33 C157 35 157 41 150 43 C140 51 126 59 112 64 C102 68 90 68 84 64 Z" fill="url(#pj-ala)" stroke="#BDB5A8" stroke-width=".8"/>
-        <path d="M95 52 L132 10 M100 54 L140 17 M104 57 L146 25 M108 59 L150 33 M111 61 L150 43" fill="none" stroke="#CFC8BC" stroke-width=".8" stroke-linecap="round"/>
-        <path d="M86 62 C88 50 96 40 106 34 C110 42 108 52 100 60 C95 64 90 65 86 62 Z" fill="#FFFFFF" opacity=".9"/>
-        <path d="M92 56 q5 -2 8 -8 M96 60 q6 -3 9 -10" fill="none" stroke="#DED8CE" stroke-width=".7" stroke-linecap="round"/>
-      </g>
-    </svg>
+    <div class="buho">
+      <img class="buho-parte buho-ala-izq" src="./assets/boda/buho.png" alt="">
+      <img class="buho-parte buho-ala-der" src="./assets/boda/buho.png" alt="">
+      <img class="buho-parte buho-cuerpo" src="./assets/boda/buho.png" alt="">
+    </div>
   </div>
 </div>
 
