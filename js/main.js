@@ -4,7 +4,7 @@
   var TARGET = new Date(2027, 0, 21, 0, 0, 0); // cuenta regresiva hasta el 21/01/2027 a las 00:00
   // Número de WhatsApp que recibe las confirmaciones cuando la página está en GitHub Pages
   // (sin + ni espacios, ej.: "5492914000000"). Vacío: el invitado elige a quién mandarlo.
-  var WHATSAPP = "";
+  var WHATSAPP = "5492931420208";
   // Link de la invitación publicada en Claude (ahí las confirmaciones se guardan en su base)
   var ARTIFACT_URL = "https://claude.ai/artifact/EhYXrakUV9p9SFZaMFQmXk";
 
