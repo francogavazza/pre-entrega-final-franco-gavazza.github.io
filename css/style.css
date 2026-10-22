@@ -489,3 +489,8 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 
 /* Al terminar la apertura el sobre se quita del todo (si no, queda una capa invisible encima de la página) */
 .door[hidden], .petalos[hidden], .pajarito[hidden] { display: none !important; }
+
+/* Los dos "Ver ubicación" quedan alineados abajo de cada arco */
+.timeline li { grid-template-rows: auto 1fr; }
+.timeline .what { height: 100%; grid-template-rows: auto auto 1fr; }
+.timeline .mapa { align-self: end; }
