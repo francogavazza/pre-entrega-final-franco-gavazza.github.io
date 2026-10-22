@@ -361,43 +361,57 @@
       });
     }
   }
-  // ===== Pajarito con la cartita =====
-  // Antes de abrir se posa sobre el sobre; al abrirse sigue a "Nos casamos" de la tarjeta;
-  // después vuela hasta el título que se está viendo (los que tienen data-pajarito).
+  // ===== Lechuza con el pergamino =====
+  // Vuela en círculos alrededor de un punto: primero el sello, al abrirse "Nos casamos" de la
+  // tarjeta y después el título que se está viendo (los que tienen data-pajarito).
+  // Entre un punto y otro se desplaza suavemente mientras sigue girando.
   var bird = $("pajarito");
   var stops = Array.prototype.slice.call(document.querySelectorAll("main [data-pajarito]"));
-  var birdX = null;
-  var birdY = null;
+  var VUELTA_MS = 5200; // lo que tarda en dar una vuelta
+  var centerX = null;
+  var centerY = null;
+  var angle = -Math.PI / 2;
+  var lastTime = null;
 
-  function birdTarget() {
-    var w = bird.offsetWidth;
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
+  function orbitCenter() {
     var el;
     if (!door.hidden) {
-      el = door.classList.contains("open") ? document.querySelector(".env-card .kicker-big") : document.querySelector(".env");
+      el = door.classList.contains("open") ? document.querySelector(".env-card .kicker-big") : $("open-door");
     } else {
       el = stops[0];
-      stops.forEach(function (s) { if (s.getBoundingClientRect().top < vh * 0.6) el = s; });
+      stops.forEach(function (s) { if (s.getBoundingClientRect().top < window.innerHeight * 0.6) el = s; });
     }
     var r = el.getBoundingClientRect();
-    var x = Math.min(vw - w - 8, r.left + r.width / 2 + Math.min(r.width / 2, 170) - w * 0.4);
-    var y = Math.max(8, Math.min(vh - w - 70, r.top - w * 0.75));
-    return [Math.max(8, x), y];
+    return [r.left + r.width / 2, r.top + Math.min(r.height, 120) / 2];
   }
 
-  function moveBird() {
-    var t = birdTarget();
-    if (birdX === null || Math.abs(t[0] - birdX) > 1 || Math.abs(t[1] - birdY) > 1) {
-      if (birdX !== null && Math.abs(t[0] - birdX) > 30) bird.classList.toggle("derecha", t[0] > birdX);
-      birdX = t[0];
-      birdY = t[1];
-      bird.style.transform = "translate(" + Math.round(birdX) + "px," + Math.round(birdY) + "px)";
-    }
-    requestAnimationFrame(moveBird);
+  function flyBird(now) {
+    var dt = lastTime === null ? 16 : Math.min(now - lastTime, 100);
+    lastTime = now;
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var w = bird.offsetWidth;
+    var h = bird.offsetHeight;
+    var t = orbitCenter();
+    var ty = Math.max(h / 2 + 10, Math.min(vh - h / 2 - 70, t[1]));
+    if (centerX === null) { centerX = t[0]; centerY = ty; }
+    var k = 1 - Math.exp(-dt / 450);
+    centerX += (t[0] - centerX) * k;
+    centerY += (ty - centerY) * k;
+
+    angle += dt * 2 * Math.PI / VUELTA_MS;
+    var rx = Math.max(40, Math.min(vw / 2 - w / 2 - 4, 170));
+    var ry = Math.min(60, rx * 0.4);
+    var x = centerX + rx * Math.cos(angle) - w / 2;
+    var y = centerY + ry * Math.sin(angle) - h / 2;
+    // Más grande cuando pasa por adelante (abajo de la vuelta) e inclinada hacia donde gira
+    var scale = 0.82 + 0.18 * (Math.sin(angle) + 1) / 2;
+    var tilt = -Math.sin(angle) * 10;
+    bird.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + tilt.toFixed(1) + "deg) scale(" + scale.toFixed(3) + ")";
+    requestAnimationFrame(flyBird);
   }
 
   if (location.hash === "#admin") bird.hidden = true;
-  else requestAnimationFrame(moveBird);
+  else requestAnimationFrame(flyBird);
 
 })();
