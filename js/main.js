@@ -361,4 +361,43 @@
       });
     }
   }
+  // ===== Pajarito con la cartita =====
+  // Antes de abrir se posa sobre el sobre; al abrirse sigue a "Nos casamos" de la tarjeta;
+  // después vuela hasta el título que se está viendo (los que tienen data-pajarito).
+  var bird = $("pajarito");
+  var stops = Array.prototype.slice.call(document.querySelectorAll("main [data-pajarito]"));
+  var birdX = null;
+  var birdY = null;
+
+  function birdTarget() {
+    var w = bird.offsetWidth;
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var el;
+    if (!door.hidden) {
+      el = door.classList.contains("open") ? document.querySelector(".env-card .kicker-big") : document.querySelector(".env");
+    } else {
+      el = stops[0];
+      stops.forEach(function (s) { if (s.getBoundingClientRect().top < vh * 0.6) el = s; });
+    }
+    var r = el.getBoundingClientRect();
+    var x = Math.min(vw - w - 8, r.left + r.width / 2 + Math.min(r.width / 2, 170) - w * 0.4);
+    var y = Math.max(8, Math.min(vh - w - 70, r.top - w * 0.75));
+    return [Math.max(8, x), y];
+  }
+
+  function moveBird() {
+    var t = birdTarget();
+    if (birdX === null || Math.abs(t[0] - birdX) > 1 || Math.abs(t[1] - birdY) > 1) {
+      if (birdX !== null && Math.abs(t[0] - birdX) > 30) bird.classList.toggle("derecha", t[0] > birdX);
+      birdX = t[0];
+      birdY = t[1];
+      bird.style.transform = "translate(" + Math.round(birdX) + "px," + Math.round(birdY) + "px)";
+    }
+    requestAnimationFrame(moveBird);
+  }
+
+  if (location.hash === "#admin") bird.hidden = true;
+  else requestAnimationFrame(moveBird);
+
 })();
