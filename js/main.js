@@ -44,18 +44,18 @@ function mostrarAviso(texto) {
 
 // ===== Sobre de bienvenida =====
 const sobre = $("#sobre");
-if (sessionStorage.getItem("invitacion-abierta")) {
-  sobre.remove();
-} else {
-  document.body.classList.add("bloqueado");
-  $("#abrir-invitacion").addEventListener("click", () => {
-    sobre.classList.add("abierto");
+document.body.classList.add("bloqueado");
+$("#abrir-invitacion").addEventListener("click", () => {
+  // 1) se rompe el sello y se abre la solapa, 2) sale la carta, 3) aparece la web
+  sobre.classList.add("abierto");
+  const espera = sinMovimiento ? 0 : 2600;
+  setTimeout(() => {
+    sobre.classList.add("saliendo");
     document.body.classList.remove("bloqueado");
-    try { sessionStorage.setItem("invitacion-abierta", "1"); } catch (e) {}
-    lanzarPetalos(60);
-    setTimeout(() => sobre.remove(), 900);
-  });
-}
+    lanzarPetalos(70);
+  }, espera);
+  setTimeout(() => sobre.remove(), espera + 1100);
+});
 
 // ===== Menú =====
 const header = $("#header");
