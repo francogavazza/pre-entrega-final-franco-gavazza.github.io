@@ -45,6 +45,7 @@
     document.querySelector(".pen-wrap").classList.add("go");
     document.body.classList.remove("locked");
     setMusic(true);
+    setTimeout(lanzarPetalos, 900);
     setTimeout(function () { door.hidden = true; }, 6600);
   }
   $("open-door").addEventListener("click", openDoor);
@@ -415,5 +416,108 @@
 
   if (location.hash === "#admin") bird.hidden = true;
   else requestAnimationFrame(flyBird);
+
+  // ===== Pétalos de rosa blancos que caen al abrir la tarjeta =====
+  var petalCanvas = $("petalos");
+  var petalCtx = petalCanvas.getContext("2d");
+  var petals = [];
+  var petalUntil = 0;
+  var petalRunning = false;
+
+  function resizePetals() {
+    var dpr = window.devicePixelRatio || 1;
+    petalCanvas.width = window.innerWidth * dpr;
+    petalCanvas.height = window.innerHeight * dpr;
+    petalCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function nuevoPetalo(arriba) {
+    var size = 11 + Math.random() * 11;
+    petals.push({
+      x: Math.random() * window.innerWidth,
+      y: arriba ? -20 - Math.random() * 60 : -Math.random() * window.innerHeight * 0.6,
+      size: size,
+      vy: 38 + Math.random() * 46,
+      sway: 18 + Math.random() * 30,
+      swaySpeed: 0.8 + Math.random() * 1.2,
+      phase: Math.random() * Math.PI * 2,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 1.6,
+      flip: Math.random() * Math.PI * 2,
+      vflip: 1.5 + Math.random() * 2.5,
+      tint: Math.random()
+    });
+  }
+
+  // Un pétalo de rosa: redondeado, con una muesca arriba y la base angosta
+  function dibujarPetalo(p) {
+    var s = p.size;
+    var ctx = petalCtx;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.scale(Math.max(0.15, Math.abs(Math.cos(p.flip))), 1);
+    var g = ctx.createRadialGradient(-s * 0.15, -s * 0.2, s * 0.1, 0, 0, s);
+    g.addColorStop(0, "#FFFFFF");
+    g.addColorStop(0.6, p.tint > 0.5 ? "#FBF6F1" : "#FDF8F8");
+    g.addColorStop(1, p.tint > 0.5 ? "#EADFD3" : "#F2E2E0");
+    ctx.fillStyle = g;
+    ctx.shadowColor = "rgba(120, 95, 70, .18)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, s * 0.62);
+    ctx.bezierCurveTo(-s * 0.75, s * 0.3, -s * 0.8, -s * 0.55, -s * 0.28, -s * 0.62);
+    ctx.quadraticCurveTo(0, -s * 0.5, 0, -s * 0.4);
+    ctx.quadraticCurveTo(0, -s * 0.5, s * 0.28, -s * 0.62);
+    ctx.bezierCurveTo(s * 0.8, -s * 0.55, s * 0.75, s * 0.3, 0, s * 0.62);
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = "rgba(205, 185, 165, .35)";
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(0, s * 0.55);
+    ctx.quadraticCurveTo(s * 0.05, 0, 0, -s * 0.35);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  var petalLast = 0;
+  var petalSpawn = 0;
+  function animarPetalos(now) {
+    var dt = Math.min((now - (petalLast || now)) / 1000, 0.05);
+    petalLast = now;
+    if (now < petalUntil) {
+      petalSpawn += dt * 6;
+      while (petalSpawn >= 1) { nuevoPetalo(true); petalSpawn--; }
+    }
+    petalCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (var i = petals.length - 1; i >= 0; i--) {
+      var p = petals[i];
+      p.phase += p.swaySpeed * dt;
+      p.y += p.vy * dt;
+      p.x += Math.cos(p.phase) * p.sway * dt;
+      p.rot += p.vrot * dt;
+      p.flip += p.vflip * dt;
+      if (p.y > window.innerHeight + 30) { petals.splice(i, 1); continue; }
+      dibujarPetalo(p);
+    }
+    if (petals.length || now < petalUntil) requestAnimationFrame(animarPetalos);
+    else { petalRunning = false; petalCanvas.hidden = true; }
+  }
+
+  function lanzarPetalos() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    resizePetals();
+    petalCanvas.hidden = false;
+    for (var i = 0; i < 35; i++) nuevoPetalo(false);
+    petalUntil = performance.now() + 8000;
+    if (!petalRunning) {
+      petalRunning = true;
+      petalLast = 0;
+      requestAnimationFrame(animarPetalos);
+    }
+  }
+  window.addEventListener("resize", function () { if (petalRunning) resizePetals(); });
 
 })();
