@@ -1,363 +1,280 @@
-// ===== Datos del casamiento (editar acá) =====
-const BODA = {
-  fecha: new Date("2027-03-20T17:00:00-03:00"),
-  whatsapp: "5491100000000", // número de los novios, sin + ni espacios
-  eventos: {
-    ceremonia: {
-      titulo: "Ceremonia - Sofía & Franco",
-      inicio: "20270320T200000Z",
-      fin: "20270320T210000Z",
-      lugar: "Parroquia Nuestra Señora del Pilar, Junín 1904, CABA",
-    },
-    fiesta: {
-      titulo: "Fiesta - Sofía & Franco",
-      inicio: "20270320T230000Z",
-      fin: "20270321T070000Z",
-      lugar: "Salón Los Jazmines, Av. del Libertador 4500, CABA",
-    },
-  },
-  // Para usar fotos reales: agregá "img: './assets/img/archivo.jpg'" a cada foto
-  fotos: [
-    { texto: "El primer café", emoji: "☕", fondo: "linear-gradient(135deg,#e8cfc4,#c9a27e)" },
-    { texto: "Patagonia 2020", emoji: "🏔️", fondo: "linear-gradient(135deg,#8a9a7b,#5d6b7a)" },
-    { texto: "Nuestro hogar", emoji: "🏡", fondo: "linear-gradient(135deg,#f3ece2,#d8b4a6)" },
-    { texto: "Atardeceres", emoji: "🌅", fondo: "linear-gradient(135deg,#d8b4a6,#7b4b52)" },
-    { texto: "La propuesta", emoji: "💍", fondo: "linear-gradient(135deg,#c9a27e,#977547)" },
-    { texto: "Con amigos", emoji: "🥂", fondo: "linear-gradient(135deg,#5d6b7a,#8a9a7b)" },
-    { texto: "Domingos", emoji: "🌻", fondo: "linear-gradient(135deg,#f3e3b5,#c9a27e)" },
-    { texto: "Para siempre", emoji: "💕", fondo: "linear-gradient(135deg,#e8cfc4,#a3454f)" },
-  ],
-};
+(function () {
+  // ===== Datos de la boda (editar acá) =====
+  var MUSIC_SRC = "./assets/boda/musica.mp3"; // El Danubio Azul, Johann Strauss (dominio público), vals de cuento
+  var TARGET = new Date(2027, 0, 21, 0, 0, 0); // cuenta regresiva hasta el 21/01/2027 a las 00:00
+  // Número de WhatsApp que recibe las confirmaciones cuando la página está en GitHub Pages
+  // (sin + ni espacios, ej.: "5492914000000"). Vacío: el invitado elige a quién mandarlo.
+  var WHATSAPP = "";
+  // Link de la invitación publicada en Claude (ahí las confirmaciones se guardan en su base)
+  var ARTIFACT_URL = "https://claude.ai/artifact/EhYXrakUV9p9SFZaMFQmXk";
 
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+  var $ = function (id) { return document.getElementById(id); };
+  var hasClaude = !!(window.claude && window.claude.use);
 
-// ===== Aviso flotante =====
-let avisoTimer;
-function mostrarAviso(texto) {
-  const aviso = $("#aviso");
-  aviso.textContent = texto;
-  aviso.classList.add("visible");
-  clearTimeout(avisoTimer);
-  avisoTimer = setTimeout(() => aviso.classList.remove("visible"), 2500);
-}
+  // ===== Sobre: al tocar el sello se abre, sale la tarjeta y empieza la música =====
+  var door = $("door");
+  var audio = $("music");
+  var musicBtn = $("music-btn");
+  var musicOn = false;
 
-// ===== Sobre de bienvenida =====
-const sobre = $("#sobre");
-document.body.classList.add("bloqueado");
-$("#abrir-invitacion").addEventListener("click", () => {
-  // 1) se rompe el sello y se abre la solapa, 2) sale la carta, 3) aparece la web
-  sobre.classList.add("abierto");
-  const espera = sinMovimiento ? 0 : 2600;
-  setTimeout(() => {
-    sobre.classList.add("saliendo");
-    document.body.classList.remove("bloqueado");
-    lanzarPetalos(70);
-  }, espera);
-  setTimeout(() => sobre.remove(), espera + 1100);
-});
+  audio.src = MUSIC_SRC;
+  musicBtn.hidden = false;
 
-// ===== Menú =====
-const header = $("#header");
-const nav = $("#nav");
-const toggle = $("#menu-toggle");
-
-function cerrarMenu() {
-  nav.classList.remove("abierto");
-  toggle.classList.remove("abierto");
-  header.classList.remove("menu-abierto");
-  toggle.setAttribute("aria-expanded", "false");
-}
-
-toggle.addEventListener("click", () => {
-  const abierto = nav.classList.toggle("abierto");
-  toggle.classList.toggle("abierto", abierto);
-  header.classList.toggle("menu-abierto", abierto);
-  toggle.setAttribute("aria-expanded", String(abierto));
-});
-$$(".nav__link").forEach((link) => link.addEventListener("click", cerrarMenu));
-
-window.addEventListener("scroll", () => {
-  header.classList.toggle("scrolleado", window.scrollY > 60);
-}, { passive: true });
-
-// Resalta el link de la sección visible
-const observadorSecciones = new IntersectionObserver((entradas) => {
-  entradas.forEach((entrada) => {
-    if (!entrada.isIntersecting) return;
-    $$(".nav__link").forEach((link) => {
-      link.classList.toggle("activo", link.getAttribute("href") === `#${entrada.target.id}`);
-    });
-  });
-}, { rootMargin: "-50% 0px -50% 0px" });
-$$("main section[id]").forEach((s) => observadorSecciones.observe(s));
-
-// ===== Cuenta regresiva =====
-function actualizarCuenta() {
-  const resto = Math.max(0, BODA.fecha - Date.now());
-  const s = Math.floor(resto / 1000);
-  $("#dias").textContent = Math.floor(s / 86400);
-  $("#horas").textContent = String(Math.floor((s % 86400) / 3600)).padStart(2, "0");
-  $("#minutos").textContent = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
-  $("#segundos").textContent = String(s % 60).padStart(2, "0");
-  if (resto === 0) {
-    $("#cuenta-regresiva").innerHTML = '<p class="hero__fecha">¡Hoy es el gran día! 🎉</p>';
-    clearInterval(intervaloCuenta);
+  function setMusic(on) {
+    musicOn = on;
+    musicBtn.setAttribute("aria-label", on ? "Pausar música" : "Poner música");
+    musicBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    if (on) audio.play().catch(function () { setMusic(false); });
+    else audio.pause();
   }
-}
-const intervaloCuenta = setInterval(actualizarCuenta, 1000);
-actualizarCuenta();
+  musicBtn.addEventListener("click", function () { setMusic(!musicOn); });
 
-// ===== Animaciones al hacer scroll =====
-const observadorRevelar = new IntersectionObserver((entradas, obs) => {
-  entradas.forEach((entrada) => {
-    if (entrada.isIntersecting) {
-      entrada.target.classList.add("visible");
-      obs.unobserve(entrada.target);
-    }
-  });
-}, { threshold: 0.15 });
-$$(".revelar").forEach((el) => observadorRevelar.observe(el));
+  function openDoor() {
+    if (door.classList.contains("open")) return;
+    door.classList.add("open", "opening");
+    document.querySelector(".kicker-big").classList.add("go");
+    document.querySelector(".pen-wrap").classList.add("go");
+    document.body.classList.remove("locked");
+    setMusic(true);
+    setTimeout(function () { door.hidden = true; }, 6600);
+  }
+  $("open-door").addEventListener("click", openDoor);
+  door.addEventListener("click", function (e) { if (e.target === door) openDoor(); });
+  document.body.classList.add("locked");
+  if (location.hash !== "#admin") document.querySelector(".kicker-big").classList.add("write");
 
-// ===== Agendar en calendario (.ics) =====
-$$("[data-calendario]").forEach((boton) => {
-  boton.addEventListener("click", () => {
-    const ev = BODA.eventos[boton.dataset.calendario];
-    const ics = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Casamiento//ES",
-      "BEGIN:VEVENT",
-      `UID:${boton.dataset.calendario}-${ev.inicio}@casamiento`,
-      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`,
-      `DTSTART:${ev.inicio}`,
-      `DTEND:${ev.fin}`,
-      `SUMMARY:${ev.titulo}`,
-      `LOCATION:${ev.lugar.replace(/,/g, "\\,")}`,
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${boton.dataset.calendario}.ics`;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-});
+  // ===== Cuenta regresiva (días y horas), se actualiza cada minuto =====
+  function tick() {
+    var ms = TARGET - new Date();
+    if (ms <= 0) return;
+    $("cd-d").textContent = Math.floor(ms / 86400000);
+    $("cd-h").textContent = Math.floor((ms % 86400000) / 3600000);
+  }
+  tick();
+  setInterval(tick, 60000);
 
-// ===== Galería + visor =====
-const galeria = $("#galeria");
-BODA.fotos.forEach((foto, i) => {
-  const item = document.createElement("button");
-  item.className = "galeria__item revelar";
-  item.dataset.texto = foto.texto;
-  item.setAttribute("aria-label", `Ver foto: ${foto.texto}`);
-  item.style.backgroundImage = foto.img ? `url("${foto.img}")` : foto.fondo;
-  if (!foto.img) item.innerHTML = `<span class="emoji">${foto.emoji}</span>`;
-  item.addEventListener("click", () => abrirVisor(i));
-  galeria.appendChild(item);
-  observadorRevelar.observe(item);
-});
-
-const visor = $("#visor");
-let fotoActual = 0;
-
-function mostrarFoto(i) {
-  fotoActual = (i + BODA.fotos.length) % BODA.fotos.length;
-  const foto = BODA.fotos[fotoActual];
-  const img = $("#visor-img");
-  img.style.backgroundImage = foto.img ? `url("${foto.img}")` : foto.fondo;
-  img.textContent = foto.img ? "" : foto.emoji;
-  $("#visor-texto").textContent = foto.texto;
-}
-
-function abrirVisor(i) {
-  mostrarFoto(i);
-  visor.hidden = false;
-  document.body.classList.add("bloqueado");
-}
-
-function cerrarVisor() {
-  visor.hidden = true;
-  document.body.classList.remove("bloqueado");
-}
-
-$(".visor__cerrar").addEventListener("click", cerrarVisor);
-$(".visor__nav--prev").addEventListener("click", () => mostrarFoto(fotoActual - 1));
-$(".visor__nav--next").addEventListener("click", () => mostrarFoto(fotoActual + 1));
-visor.addEventListener("click", (e) => { if (e.target === visor) cerrarVisor(); });
-document.addEventListener("keydown", (e) => {
-  if (visor.hidden) return;
-  if (e.key === "Escape") cerrarVisor();
-  if (e.key === "ArrowLeft") mostrarFoto(fotoActual - 1);
-  if (e.key === "ArrowRight") mostrarFoto(fotoActual + 1);
-});
-
-// Deslizar en celulares
-let toqueX = null;
-visor.addEventListener("touchstart", (e) => { toqueX = e.touches[0].clientX; }, { passive: true });
-visor.addEventListener("touchend", (e) => {
-  if (toqueX === null) return;
-  const dx = e.changedTouches[0].clientX - toqueX;
-  if (Math.abs(dx) > 50) mostrarFoto(fotoActual + (dx < 0 ? 1 : -1));
-  toqueX = null;
-});
-
-// ===== Copiar datos bancarios =====
-$$("[data-copiar]").forEach((boton) => {
-  boton.addEventListener("click", async () => {
-    const texto = $(`#${boton.dataset.copiar}`).textContent;
+  // ===== Copiar alias y CVU =====
+  function copyText(btn, text, selectEl, okLabel) {
+    var original = btn.textContent;
+    var flash = function (label) {
+      btn.textContent = label;
+      setTimeout(function () { btn.textContent = original; }, 1600);
+    };
+    var fallback = function () {
+      try {
+        var range = document.createRange();
+        range.selectNodeContents(selectEl);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        flash("Seleccionado");
+      } catch (e) { flash("No se pudo"); }
+    };
     try {
-      await navigator.clipboard.writeText(texto);
-      mostrarAviso(`Copiado: ${texto}`);
-    } catch (e) {
-      mostrarAviso("No se pudo copiar, copialo manualmente");
-    }
-  });
-});
-
-// ===== Formulario de confirmación =====
-const form = $("#form-rsvp");
-const confirmacion = $("#confirmacion");
-const inputInvitados = $("#invitados");
-
-$$(".contador button").forEach((boton) => {
-  boton.addEventListener("click", () => {
-    const valor = Number(inputInvitados.value) + Number(boton.dataset.paso);
-    inputInvitados.value = Math.min(Number(inputInvitados.max), Math.max(Number(inputInvitados.min), valor));
-  });
-});
-
-$$('input[name="asistencia"]').forEach((radio) => {
-  radio.addEventListener("change", () => {
-    form.classList.toggle("no-asiste", radio.value === "no" && radio.checked);
-  });
-});
-
-function marcarError(campo, mensaje) {
-  campo.classList.toggle("error", Boolean(mensaje));
-  $(".campo__error", campo).textContent = mensaje || "";
-}
-
-function mostrarConfirmacion(datos) {
-  const asiste = datos.asistencia === "si";
-  $("#confirmacion-titulo").textContent = asiste ? `¡Gracias, ${datos.nombre}!` : `Te vamos a extrañar, ${datos.nombre}`;
-  $("#confirmacion-texto").textContent = asiste
-    ? `Confirmaste ${datos.invitados} ${datos.invitados === "1" ? "lugar" : "lugares"} con menú ${datos.menu.toLowerCase()}. ¡Nos vemos en la pista!`
-    : "Gracias por avisarnos. ¡Vamos a brindar por vos!";
-
-  const mensaje = [
-    `Hola! Soy ${datos.nombre}.`,
-    asiste ? `Confirmo asistencia para ${datos.invitados} persona(s). Menú: ${datos.menu}.` : "Lamentablemente no voy a poder ir.",
-    datos.cancion ? `Canción: ${datos.cancion}` : "",
-    datos.mensaje ? `Mensaje: ${datos.mensaje}` : "",
-  ].filter(Boolean).join("\n");
-  $("#enviar-whatsapp").href = `https://wa.me/${BODA.whatsapp}?text=${encodeURIComponent(mensaje)}`;
-
-  form.hidden = true;
-  confirmacion.hidden = false;
-}
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const datos = Object.fromEntries(new FormData(form));
-  datos.nombre = (datos.nombre || "").trim();
-
-  const campoNombre = $("#nombre").closest(".campo");
-  const campoAsistencia = $('input[name="asistencia"]').closest(".campo");
-  marcarError(campoNombre, datos.nombre.length < 3 ? "Ingresá tu nombre y apellido" : "");
-  marcarError(campoAsistencia, datos.asistencia ? "" : "Elegí una opción");
-  if (datos.nombre.length < 3 || !datos.asistencia) return;
-
-  try { localStorage.setItem("rsvp", JSON.stringify(datos)); } catch (err) {}
-  mostrarConfirmacion(datos);
-  if (datos.asistencia === "si") lanzarPetalos(80);
-});
-
-$("#editar-rsvp").addEventListener("click", () => {
-  confirmacion.hidden = true;
-  form.hidden = false;
-});
-
-// Recupera una respuesta ya enviada
-try {
-  const guardado = JSON.parse(localStorage.getItem("rsvp"));
-  if (guardado) {
-    $("#nombre").value = guardado.nombre;
-    $(`input[name="asistencia"][value="${guardado.asistencia}"]`).checked = true;
-    form.classList.toggle("no-asiste", guardado.asistencia === "no");
-    inputInvitados.value = guardado.invitados || 1;
-    $("#menu").value = guardado.menu || "Estándar";
-    $("#cancion").value = guardado.cancion || "";
-    $("#mensaje").value = guardado.mensaje || "";
-    mostrarConfirmacion(guardado);
+      navigator.clipboard.writeText(text).then(function () { flash(okLabel || "¡Copiado!"); }, fallback);
+    } catch (e) { fallback(); }
   }
-} catch (err) {}
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var src = $(btn.getAttribute("data-copy"));
+      copyText(btn, src.textContent.trim(), src);
+    });
+  });
 
-// ===== Pétalos cayendo =====
-const canvas = $("#petalos");
-const ctx = canvas.getContext("2d");
-const petalos = [];
-const colores = ["#e8cfc4", "#d8b4a6", "#f3e3d9", "#c9a27e"];
-const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-let animando = false;
+  // ===== Confirmación de asistencia =====
+  // Una persona por cada línea escrita
+  function countPeople() {
+    return $("hogar").value.split("\n").filter(function (l) { return l.trim().length > 0; }).length;
+  }
 
-function ajustarCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", ajustarCanvas);
-ajustarCanvas();
+  function setStatus(msg, isErr) {
+    var s = $("status");
+    s.textContent = msg || "";
+    s.className = "status" + (isErr ? " err" : "");
+  }
 
-function lanzarPetalos(cantidad) {
-  if (sinMovimiento) return;
-  for (let i = 0; i < cantidad; i++) {
-    petalos.push({
-      x: Math.random() * canvas.width,
-      y: -20 - Math.random() * canvas.height * 0.5,
-      tam: 6 + Math.random() * 8,
-      vel: 1 + Math.random() * 2,
-      giro: Math.random() * Math.PI,
-      vGiro: (Math.random() - 0.5) * 0.05,
-      osc: Math.random() * Math.PI * 2,
-      color: colores[Math.floor(Math.random() * colores.length)],
+  function showDone(count) {
+    $("send").textContent = "Cambiar respuesta";
+    $("done").classList.add("show");
+    $("done-msg").textContent = "Anotamos tu respuesta para " + count + (count === 1 ? " persona." : " personas.");
+  }
+
+  function validate() {
+    if ($("hogar").value.trim().length < 3) {
+      setStatus("Escribí el nombre y apellido de cada persona que va a asistir.", true);
+      $("hogar").focus();
+      return false;
+    }
+    setStatus("");
+    return true;
+  }
+
+  // En Claude: se guarda en la base del artefacto (cada invitado solo ve la suya)
+  var db = null;
+  var uid = null;
+  function submitClaude() {
+    if (!validate()) return;
+    if (!db || !uid) { setStatus("Para confirmar necesitás iniciar sesión.", true); return; }
+    var count = countPeople();
+    var btn = $("send");
+    btn.disabled = true;
+    setStatus("Guardando…");
+    db.doc("rsvp/" + uid).set({ hogar: $("hogar").value.trim(), personas: count, actualizado: new Date().toISOString() })
+      .then(function () {
+        setStatus("");
+        btn.disabled = false;
+        showDone(count);
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        if (err && err.code === "quota_exceeded") setStatus("Ya no hay lugar para más confirmaciones. Escribinos directamente.", true);
+        else setStatus("No se pudo guardar. Revisá la conexión e intentá de nuevo.", true);
+      });
+  }
+
+  // En GitHub Pages (sin base de datos): se arma el mensaje y se manda por WhatsApp
+  function submitStatic() {
+    if (!validate()) return;
+    var count = countPeople();
+    var names = $("hogar").value.trim();
+    var text = "¡Hola Fran y Sofi! Confirmo asistencia al casamiento para " + count +
+      (count === 1 ? " persona" : " personas") + ":\n" + names;
+    try { localStorage.setItem("rsvp-fran-sofi", names); } catch (e) {}
+    showDone(count);
+    window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(text), "_blank", "noopener");
+  }
+
+  if (hasClaude) {
+    Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function (res) {
+      db = res[0];
+      var user = res[1];
+      if (!db) { setStatus("La confirmación no está disponible en este momento.", true); return; }
+      $("send").disabled = false;
+      $("send").addEventListener("click", function (e) { e.preventDefault(); submitClaude(); });
+      if (!user) return;
+      return Promise.resolve(user.id()).then(function (id) {
+        uid = id;
+        if (!uid) return;
+        db.doc("rsvp/" + uid).onSnapshot(function (snap) {
+          if (snap.exists && !$("hogar").value) {
+            var data = snap.data() || {};
+            $("hogar").value = data.hogar || "";
+            showDone(Number(data.personas) || countPeople());
+          }
+        }, function () {});
+      });
+    }).catch(function () { setStatus("La confirmación no está disponible en este momento.", true); });
+  } else {
+    $("send").disabled = false;
+    $("send").addEventListener("click", function (e) { e.preventDefault(); submitStatic(); });
+    try {
+      var saved = localStorage.getItem("rsvp-fran-sofi");
+      if (saved) { $("hogar").value = saved; showDone(countPeople()); }
+    } catch (e) {}
+  }
+  $("rsvp").addEventListener("submit", function (e) { e.preventDefault(); });
+
+  // ===== Nombres del invitado: van en el link como #n-<nombres en base64url> =====
+  function encodeNames(text) {
+    var bytes = new TextEncoder().encode(text);
+    var bin = "";
+    bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function decodeNames(code) {
+    try {
+      var b64 = code.replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      var bin = atob(b64);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes).trim();
+    } catch (e) { return ""; }
+  }
+  if (location.hash.indexOf("#n-") === 0) {
+    var names = decodeNames(location.hash.slice(3));
+    if (names) {
+      $("guest-names").textContent = names;
+      $("guest-names").hidden = false;
+      $("card-names").textContent = names;
+      $("card-names").hidden = false;
+    }
+  }
+
+  // ===== Panel para Fran y Sofi (se abre con #admin) =====
+  var baseUrl = hasClaude ? ARTIFACT_URL : location.href.split("#")[0];
+  var genLink = "";
+  $("gen-names").addEventListener("input", function () {
+    var v = $("gen-names").value.trim();
+    genLink = v ? baseUrl + "#n-" + encodeNames(v) : "";
+    $("gen-out").textContent = genLink;
+    $("gen-copy").hidden = !genLink;
+  });
+  $("gen-copy").addEventListener("click", function () {
+    copyText($("gen-copy"), genLink, $("gen-out"));
+  });
+
+  function fmtDate(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  var adminRows = [];
+  function renderAdmin(docs) {
+    adminRows = docs.map(function (d) {
+      var x = d.data() || {};
+      return { hogar: String(x.hogar || ""), personas: Number(x.personas) || 0, actualizado: String(x.actualizado || "") };
+    }).sort(function (a, b) { return a.actualizado < b.actualizado ? 1 : -1; });
+    var people = 0;
+    adminRows.forEach(function (r) { people += r.personas; });
+    $("admin-sum").textContent = adminRows.length === 0
+      ? "Todavía no hay confirmaciones."
+      : adminRows.length + (adminRows.length === 1 ? " hogar confirmó" : " hogares confirmaron") + " · " + people + (people === 1 ? " persona" : " personas") + " en total.";
+    var tbody = $("admin-rows");
+    tbody.textContent = "";
+    adminRows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      [r.hogar.replace(/\n/g, ", "), String(r.personas), fmtDate(r.actualizado)].forEach(function (t) {
+        var td = document.createElement("td");
+        td.textContent = t;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    $("admin-csv").hidden = adminRows.length === 0;
+  }
+  function csvCell(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }
+  // Excel en español abre el CSV con punto y coma; el BOM mantiene las tildes
+  function downloadCsv() {
+    var lines = [["Nombre y apellido", "Personas", "Actualizado"].map(csvCell).join(";")];
+    adminRows.forEach(function (r) {
+      lines.push([r.hogar.replace(/\n/g, ", "), r.personas, r.actualizado].map(csvCell).join(";"));
+    });
+    var data = "﻿" + lines.join("\r\n");
+    window.claude.use("downloads").then(function (api) {
+      if (!api) { $("admin-status").textContent = "La descarga no está disponible en esta vista."; return; }
+      return api.save({ filename: "confirmaciones-fran-y-sofi.csv", data: data }).then(function () {
+        $("admin-status").textContent = "";
+      }, function (err) {
+        $("admin-status").textContent = err && err.code === "declined" ? "" : "No se pudo descargar. Probá de nuevo.";
+      });
     });
   }
-  if (!animando) {
-    animando = true;
-    requestAnimationFrame(animarPetalos);
-  }
-}
+  $("admin-csv").addEventListener("click", downloadCsv);
 
-function animarPetalos() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let i = petalos.length - 1; i >= 0; i--) {
-    const p = petalos[i];
-    p.y += p.vel;
-    p.osc += 0.02;
-    p.x += Math.sin(p.osc) * 0.8;
-    p.giro += p.vGiro;
-    if (p.y > canvas.height + 20) {
-      petalos.splice(i, 1);
-      continue;
+  if (location.hash === "#admin") {
+    document.querySelector("main").hidden = true;
+    door.hidden = true;
+    document.body.classList.remove("locked");
+    $("admin").hidden = false;
+    if (!hasClaude) {
+      $("admin-sum").textContent = "En esta versión las confirmaciones llegan por WhatsApp. La lista completa está en la invitación publicada en Claude.";
+    } else {
+      window.claude.use("db").then(function (api) {
+        if (!api) { $("admin-sum").textContent = "La base no está disponible en esta vista."; return; }
+        api.collection("rsvp").onSnapshot(renderAdmin, function () {
+          $("admin-sum").textContent = "Esta sección es solo para Fran y Sofi. Iniciá sesión con la cuenta de la boda.";
+        });
+      });
     }
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.giro);
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = 0.85;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, p.tam, p.tam / 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
   }
-  if (petalos.length) {
-    requestAnimationFrame(animarPetalos);
-  } else {
-    animando = false;
-  }
-}
-
-// Pétalos al tocar los nombres
-$(".hero__nombres").addEventListener("click", () => lanzarPetalos(40));
+})();
