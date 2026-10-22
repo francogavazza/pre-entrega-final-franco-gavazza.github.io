@@ -211,18 +211,35 @@ section { display: grid; gap: 22px; }
 .drape { height: 70px; background-repeat: no-repeat; background-size: 100% 100%; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 70' preserveAspectRatio='none'><path d='M0 30 C80 0 140 60 220 28 S340 4 400 30 L400 70 L0 70 Z' fill='%23E9DCC4'/><path d='M0 44 C90 18 150 62 230 40 S340 22 400 44 L400 70 L0 70 Z' fill='%23D9C49C'/></svg>"); }
 
 /* Línea de tiempo del día */
-.timeline { display: grid; gap: 0; position: relative; }
-.timeline li { list-style: none; display: grid; grid-template-columns: 96px 22px 1fr; gap: 14px; align-items: start; padding-block: 14px; }
-.timeline ul { margin: 0; padding: 0; }
-.timeline .when { font-size: 44px; font-weight: 500; line-height: 1; color: var(--ink); text-align: right; font-variant-numeric: lining-nums; padding-top: 2px; }
-.timeline .when small { display: block; margin-top: 6px; font-family: "Montserrat", system-ui, sans-serif; font-size: 13px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-deep); }
-.timeline .dot { position: relative; height: 100%; min-height: 60px; }
-.timeline .dot::before { content: ""; position: absolute; left: 50%; top: 6px; width: 1px; bottom: -14px; transform: translateX(-50%); background: var(--gold); }
-.timeline li:last-child .dot::before { display: none; }
-.timeline .dot::after { content: ""; position: absolute; left: 50%; top: 2px; width: 10px; height: 10px; transform: translateX(-50%); border-radius: 50%; background: var(--gold-soft); box-shadow: 0 0 0 3px rgba(201,164,106,0.25); }
-.timeline .what { display: grid; gap: 4px; }
-.timeline .what h3 { margin: 0; font-size: 25px; font-weight: 600; color: var(--gold-soft); }
-.timeline .what p { color: var(--cream-2); font-size: 20px; opacity: 1; line-height: 1.4; }
+/* Cronograma: dos arcos con doble filete dorado, uno al lado del otro */
+.timeline { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+.timeline li {
+  list-style: none;
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 10px;
+  padding: 30px 12px 22px;
+  text-align: center;
+  border: 1px solid #C9A23A;
+  border-radius: 999px 999px 6px 6px;
+  background: rgba(255, 255, 255, .45);
+}
+.timeline li::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(201, 162, 58, .55);
+  border-radius: 999px 999px 3px 3px;
+  pointer-events: none;
+}
+.timeline .when { font-size: 48px; font-weight: 500; line-height: 1; text-align: center; font-variant-numeric: lining-nums; }
+.timeline .when small { display: block; margin-top: 6px; font-family: "Montserrat", system-ui, sans-serif; font-size: 12px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase; }
+.timeline .when::after { content: "❦"; display: block; margin-top: 8px; font-family: "Cormorant Garamond", serif; font-size: 18px; line-height: 1; }
+.timeline .what { display: grid; gap: 6px; justify-items: center; }
+.timeline .what h3 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.2; }
+.timeline .what p { font-size: 18px; line-height: 1.35; }
 
 /* Paradas del día (en tarjetas crema) */
 .stops { display: grid; gap: 40px; }
@@ -442,8 +459,6 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
 #send:hover:not(:disabled) { background: rgba(212, 175, 55, .1) !important; -webkit-background-clip: border-box !important; background-clip: border-box !important; -webkit-text-fill-color: var(--gold-deep) !important; }
 #music-btn.music { -webkit-text-fill-color: var(--gold-deep); }
 /* Líneas, puntos y marcos */
-.timeline .dot::before { background: linear-gradient(#EBCB6B, #A8801C); }
-.timeline .dot::after { background: radial-gradient(circle at 35% 30%, #FBEFC0, #D4AF37 55%, #8C6A14); box-shadow: 0 0 0 3px rgba(212, 175, 55, .25); }
 .ornament::before, .ornament::after, figure > span[aria-hidden] { background: var(--oro) !important; }
 textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-color: #C9A23A; }
 @keyframes oro-destello { 0%, 55% { background-position: 0% 0; } 80%, 100% { background-position: 100% 0; } }
@@ -454,12 +469,13 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 
 /* Link "Ver ubicación" en el cronograma */
 .timeline .mapa {
-  justify-self: start;
+  justify-self: center;
   margin-top: 4px;
+  white-space: nowrap;
   font-family: "Montserrat", sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: .18em;
+  letter-spacing: .12em;
   text-transform: uppercase;
   text-decoration: none;
   border-bottom: 1px solid #C9A23A;
@@ -470,3 +486,6 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
+
+/* Al terminar la apertura el sobre se quita del todo (si no, queda una capa invisible encima de la página) */
+.door[hidden], .petalos[hidden], .pajarito[hidden] { display: none !important; }
