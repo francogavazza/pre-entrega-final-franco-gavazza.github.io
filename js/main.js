@@ -4,13 +4,13 @@ const BODA = {
   whatsapp: "5491100000000", // número de los novios, sin + ni espacios
   eventos: {
     ceremonia: {
-      titulo: "Ceremonia - Sofía & Martín",
+      titulo: "Ceremonia - Sofía & Franco",
       inicio: "20270320T200000Z",
       fin: "20270320T210000Z",
       lugar: "Parroquia Nuestra Señora del Pilar, Junín 1904, CABA",
     },
     fiesta: {
-      titulo: "Fiesta - Sofía & Martín",
+      titulo: "Fiesta - Sofía & Franco",
       inicio: "20270320T230000Z",
       fin: "20270321T070000Z",
       lugar: "Salón Los Jazmines, Av. del Libertador 4500, CABA",
