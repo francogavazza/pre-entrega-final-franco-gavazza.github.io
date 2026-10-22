@@ -357,38 +357,43 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   mask-image: radial-gradient(ellipse at center, #000 48%, transparent 71%);
 }
 
-/* Lechuza con el pergamino: vuela acompañando la carta y cada título */
+/* Pajarito con la cartita: chiquito, vuela en círculos por la carta y cada título */
 .pajarito {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 60;
-  width: clamp(110px, 30vw, 150px);
+  width: clamp(46px, 13vw, 58px);
   pointer-events: none;
   will-change: transform;
 }
-.pajarito-vuelo { animation: pajarito-flota 2.8s ease-in-out infinite; }
-.buho { position: relative; aspect-ratio: 733 / 548; filter: drop-shadow(0 8px 8px rgba(70, 50, 30, .22)); }
-.buho-parte { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-/* Cada ala gira desde su hombro; el cuerpo va adelante y tapa la unión */
-.buho-ala-izq {
-  clip-path: polygon(0% 0%, 48.5% 0%, 48.5% 54.7%, 47% 76.6%, 0% 100%);
-  transform-origin: 47.7% 54.7%;
-  animation: buho-ala-izq .5s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+.pajarito-vuelo { animation: pajarito-flota 2.4s ease-in-out infinite; transition: transform .35s ease; }
+.pajarito.izquierda .pajarito-vuelo { transform: scaleX(-1); }
+.pajaro { position: relative; aspect-ratio: 684 / 631; filter: drop-shadow(0 3px 3px rgba(40, 60, 90, .2)); }
+.pajaro-parte { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* El ala gira desde el hombro; el cuerpo va adelante y tapa la unión */
+.pajaro-ala {
+  clip-path: polygon(0% 0%, 76% 0%, 76% 37%, 66% 44%, 45% 54%, 0% 54%);
+  transform-origin: 64% 42%;
+  animation: pajaro-aletea .28s cubic-bezier(.45, 0, .55, 1) infinite alternate;
 }
-.buho-ala-der {
-  clip-path: polygon(58% 0%, 100% 0%, 100% 60.2%, 65.5% 60.2%, 60.7% 54.7%, 58% 43.8%);
-  transform-origin: 62% 53%;
-  animation: buho-ala-der .5s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+.pajaro-cuerpo {
+  clip-path: polygon(0% 54%, 45% 54%, 66% 44%, 76% 37%, 76% 0%, 100% 0%, 100% 100%, 0% 100%);
+  animation: pajaro-cuerpo .28s cubic-bezier(.45, 0, .55, 1) infinite alternate;
 }
-.buho-cuerpo {
-  clip-path: polygon(45.7% 45.6%, 60% 39.2%, 65.5% 56.6%, 76.4% 63.9%, 81.9% 100%, 45% 100%, 43.7% 76.6%);
-  animation: buho-cuerpo .5s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+.pajaro-cartita {
+  position: absolute;
+  left: 90%;
+  top: 27%;
+  width: 34%;
+  transform: rotate(10deg);
+  transform-origin: 10% 10%;
+  animation: pajaro-cartita 1.2s ease-in-out infinite alternate;
 }
-@keyframes buho-ala-izq { from { transform: rotate(9deg) scaleX(1); } to { transform: rotate(-16deg) scaleX(.9); } }
-@keyframes buho-ala-der { from { transform: rotate(-9deg) scaleX(1); } to { transform: rotate(16deg) scaleX(.9); } }
-@keyframes buho-cuerpo { from { translate: 0 -1px; } to { translate: 0 2px; } }
-@keyframes pajarito-flota { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+@keyframes pajaro-aletea { from { transform: rotate(6deg); } to { transform: rotate(-38deg) scaleY(.7); } }
+@keyframes pajaro-cuerpo { from { translate: 0 1px; } to { translate: 0 -1.5px; } }
+@keyframes pajaro-cartita { from { transform: rotate(4deg); } to { transform: rotate(16deg); } }
+@keyframes pajarito-flota { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
 
 /* ---------- Oro metálico ----------
    Todo lo dorado pasa de un color plano a un degradado de oro con brillos y sombras.

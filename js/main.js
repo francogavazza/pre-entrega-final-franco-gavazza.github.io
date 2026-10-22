@@ -361,7 +361,7 @@
       });
     }
   }
-  // ===== Lechuza con el pergamino =====
+  // ===== Pajarito con la cartita =====
   // Vuela en círculos alrededor de un punto: primero el sello, al abrirse "Nos casamos" de la
   // tarjeta y después el título que se está viendo (los que tienen data-pajarito).
   // Entre un punto y otro se desplaza suavemente mientras sigue girando.
@@ -400,13 +400,15 @@
     centerY += (ty - centerY) * k;
 
     angle += dt * 2 * Math.PI / VUELTA_MS;
-    var rx = Math.max(40, Math.min(vw / 2 - w / 2 - 4, 170));
-    var ry = Math.min(60, rx * 0.4);
+    var rx = Math.max(40, Math.min(vw / 2 - w / 2 - 4, 150));
+    var ry = Math.min(45, rx * 0.3);
     var x = centerX + rx * Math.cos(angle) - w / 2;
     var y = centerY + ry * Math.sin(angle) - h / 2;
     // Más grande cuando pasa por adelante (abajo de la vuelta) e inclinada hacia donde gira
     var scale = 0.82 + 0.18 * (Math.sin(angle) + 1) / 2;
     var tilt = -Math.sin(angle) * 10;
+    // Mira hacia el lado al que vuela
+    bird.classList.toggle("izquierda", Math.sin(angle) > 0);
     bird.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + tilt.toFixed(1) + "deg) scale(" + scale.toFixed(3) + ")";
     requestAnimationFrame(flyBird);
   }
