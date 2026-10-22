@@ -357,30 +357,38 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   mask-image: radial-gradient(ellipse at center, #000 48%, transparent 71%);
 }
 
-/* Pajarito con la cartita: vuela acompañando la carta y cada título */
+/* Lechuza con el pergamino: vuela acompañando la carta y cada título */
 .pajarito {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 60;
-  width: clamp(92px, 26vw, 120px);
+  width: clamp(110px, 30vw, 150px);
   pointer-events: none;
   transition: transform 1.1s cubic-bezier(.35, .1, .25, 1), opacity .6s ease;
   will-change: transform;
 }
 .pajarito-vuelo { animation: pajarito-flota 2.8s ease-in-out infinite; transition: transform .5s ease; }
 .pajarito.derecha .pajarito-vuelo { transform: scaleX(-1); }
-.pajarito svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 6px 6px rgba(90, 70, 40, .18)); }
-/* Aleteo: el ala sube por encima del lomo y baja por debajo del cuerpo; el cuerpo acompaña */
-.pajarito .ala { transform-box: view-box; transform-origin: 88px 63px; animation: pajarito-aletea .42s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
-.pajarito .ala-atras { animation-delay: -.05s; }
-.pajarito .cuerpo { animation: pajarito-cuerpo .42s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
-.pajarito .cartita { animation: pajarito-cartita 1.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 90% 10%; }
-@keyframes pajarito-aletea {
-  from { transform: rotate(-4deg) scaleY(1); }
-  to { transform: rotate(8deg) scaleY(-.75) skewX(-8deg); }
+.buho { position: relative; aspect-ratio: 733 / 548; filter: drop-shadow(0 8px 8px rgba(70, 50, 30, .22)); }
+.buho-parte { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Cada ala gira desde su hombro; el cuerpo va adelante y tapa la unión */
+.buho-ala-izq {
+  clip-path: polygon(0% 0%, 48.5% 0%, 48.5% 54.7%, 47% 76.6%, 0% 100%);
+  transform-origin: 47.7% 54.7%;
+  animation: buho-ala-izq .5s cubic-bezier(.45, 0, .55, 1) infinite alternate;
 }
-@keyframes pajarito-cuerpo { from { translate: 0 1.5px; } to { translate: 0 -2.5px; } }
+.buho-ala-der {
+  clip-path: polygon(58% 0%, 100% 0%, 100% 60.2%, 65.5% 60.2%, 60.7% 54.7%, 58% 43.8%);
+  transform-origin: 62% 53%;
+  animation: buho-ala-der .5s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+}
+.buho-cuerpo {
+  clip-path: polygon(45.7% 45.6%, 60% 39.2%, 65.5% 56.6%, 76.4% 63.9%, 81.9% 100%, 45% 100%, 43.7% 76.6%);
+  animation: buho-cuerpo .5s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+}
+@keyframes buho-ala-izq { from { transform: rotate(9deg) scaleX(1); } to { transform: rotate(-16deg) scaleX(.9); } }
+@keyframes buho-ala-der { from { transform: rotate(-9deg) scaleX(1); } to { transform: rotate(16deg) scaleX(.9); } }
+@keyframes buho-cuerpo { from { translate: 0 -1px; } to { translate: 0 2px; } }
 @keyframes pajarito-flota { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
-@keyframes pajarito-cartita { from { rotate: -4deg; } to { rotate: 5deg; } }
 @media (prefers-reduced-motion: reduce) { .pajarito { transition: none; } }
