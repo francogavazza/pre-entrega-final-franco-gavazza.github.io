@@ -43,7 +43,7 @@
   var TARJETA_LISTA_MS = 3600;  // cuando la tarjeta ya está adelante
   var TARJETA_SOLA_MS = 40000;  // por las dudas: si algo falla, igual se pasa a la página
   var FRASE = "Dos historias que se cruzaron y decidieron empezar a escribirse juntas. Nos gustaría que seas parte de este nuevo capítulo.";
-  var LETRA_MS = 62;            // velocidad de la pluma (milisegundos por letra)
+  var LETRA_MS = 75;            // velocidad de la pluma (milisegundos por letra)
   var PAUSA_FINAL_MS = 2200;    // cuánto queda la frase completa antes de abrir la página
   var openedAt = 0;
   var leaving = false;
@@ -96,10 +96,37 @@
     escrito.appendChild(w);
   });
 
-  function moverPluma(l) {
-    var x = escrito.offsetLeft + l.offsetLeft + l.offsetWidth;
-    var y = escrito.offsetTop + l.offsetTop + l.offsetHeight * 0.78;
-    pluma.style.transform = "translate(" + x.toFixed(1) + "px," + (y - pluma.offsetHeight).toFixed(1) + "px)";
+  // La punta de la pluma (abajo a la izquierda del dibujo) recorre cada letra de izquierda a derecha
+  // mientras la tinta aparece detrás de ella, con un pequeño vaivén como al escribir a mano.
+  var PUNTA_X = 3 / 64, PUNTA_Y = 62 / 64;
+  function ponerPluma(x, y, giro) {
+    var w = pluma.offsetWidth, h = pluma.offsetHeight;
+    pluma.style.transform = "translate(" + (x - w * PUNTA_X).toFixed(1) + "px," + (y - h * PUNTA_Y).toFixed(1) +
+      "px) rotate(" + giro.toFixed(1) + "deg)";
+  }
+
+  function trazarLetra(l, dur, listo) {
+    // la letra tiene un margen invisible (padding) alrededor: se descuenta para ubicar la pluma
+    var cs = getComputedStyle(l);
+    var px = parseFloat(cs.paddingLeft), py = parseFloat(cs.paddingTop);
+    var ancho = l.offsetWidth - 2 * px, altoLetra = l.offsetHeight - 2 * py;
+    var x0 = escrito.offsetLeft + l.offsetLeft + px;
+    var x1 = x0 + ancho;
+    var base = escrito.offsetTop + l.offsetTop + py + altoLetra * 0.72;
+    var alto = altoLetra * 0.32;
+    l.style.backgroundSize = escrito.offsetWidth + "px " + escrito.offsetHeight + "px";
+    l.style.backgroundPosition = -l.offsetLeft + "px " + -l.offsetTop + "px";
+    l.style.setProperty("--d", dur + "ms");
+    l.classList.add("v");
+    var t0 = performance.now();
+    (function cuadro(now) {
+      if (leaving) return;
+      var k = Math.min(1, (now - t0) / dur);
+      // sube y baja una vez por letra, como el trazo de la mano
+      ponerPluma(x0 + (x1 - x0) * k, base - Math.sin(k * Math.PI) * alto, -6 + Math.sin(k * Math.PI * 2) * 4);
+      if (k < 1) requestAnimationFrame(cuadro);
+      else listo();
+    })(t0);
   }
 
   var escribiendo = false;
@@ -121,11 +148,14 @@
         return;
       }
       var l = letras[i++];
-      l.classList.add("v");
-      moverPluma(l);
-      // pausa un poco más en las comas y los puntos, como al escribir a mano
       var ch = l.textContent;
-      setTimeout(siguiente, LETRA_MS + (ch === "." ? 450 : ch === "," ? 250 : 0));
+      trazarLetra(l, LETRA_MS, function () {
+        // pausa un poco más en las comas y los puntos, y un respiro entre palabras
+        var pausa = ch === "." ? 450 : ch === "," ? 250 : 0;
+        var prox = letras[i];
+        if (prox && prox.parentNode !== l.parentNode) pausa += 60;
+        setTimeout(siguiente, pausa);
+      });
     })();
   }
 
