@@ -41,7 +41,10 @@
   // Apertura: se levanta la solapa, sale la tarjeta y queda adelante para leerla.
   // Se pasa a la página al tocar la pantalla o sola después de un rato.
   var TARJETA_LISTA_MS = 3600;  // cuando la tarjeta ya está adelante
-  var TARJETA_SOLA_MS = 24000;  // si nadie toca, se pasa sola a la página (unos 20 s de lectura)
+  var TARJETA_SOLA_MS = 40000;  // por las dudas: si algo falla, igual se pasa a la página
+  var FRASE = "Dos historias que se cruzaron y decidieron empezar a escribirse juntas. Nos encantaría que seas parte del capítulo más importante.";
+  var LETRA_MS = 62;            // velocidad de la pluma (milisegundos por letra)
+  var PAUSA_FINAL_MS = 2200;    // cuánto queda la frase completa antes de abrir la página
   var openedAt = 0;
   var leaving = false;
 
@@ -49,10 +52,9 @@
     if (door.classList.contains("open")) return;
     openedAt = performance.now();
     door.classList.add("open");
-    document.querySelector(".kicker-big").classList.add("go");
-    document.querySelector(".pen-wrap").classList.add("go");
     setMusic(true);
     setTimeout(lanzarPetalos, 900);
+    setTimeout(escribirFrase, TARJETA_LISTA_MS + 200);
     setTimeout(leaveDoor, TARJETA_SOLA_MS);
   }
 
@@ -73,7 +75,59 @@
     else if (performance.now() - openedAt > TARJETA_LISTA_MS) leaveDoor();
   });
   document.body.classList.add("locked");
-  if (location.hash !== "#admin") document.querySelector(".kicker-big").classList.add("write");
+
+  // ===== La frase de la tarjeta, escrita a pluma letra por letra =====
+  // Todas las letras se arman desde el principio (invisibles) para que el texto no salte al escribirse;
+  // después se van mostrando una por una y la pluma sigue a la última. Al terminar se abre la página.
+  var escrito = $("card-escrito");
+  var pluma = $("card-pluma");
+  var letras = [];
+  FRASE.split(" ").forEach(function (palabra, i) {
+    if (i) escrito.appendChild(document.createTextNode(" "));
+    var w = document.createElement("span");
+    w.className = "palabra";
+    Array.prototype.forEach.call(palabra, function (ch) {
+      var l = document.createElement("span");
+      l.className = "letra";
+      l.textContent = ch;
+      w.appendChild(l);
+      letras.push(l);
+    });
+    escrito.appendChild(w);
+  });
+
+  function moverPluma(l) {
+    var x = escrito.offsetLeft + l.offsetLeft + l.offsetWidth;
+    var y = escrito.offsetTop + l.offsetTop + l.offsetHeight * 0.78;
+    pluma.style.transform = "translate(" + x.toFixed(1) + "px," + (y - pluma.offsetHeight).toFixed(1) + "px)";
+  }
+
+  var escribiendo = false;
+  function escribirFrase() {
+    if (escribiendo || leaving) return;
+    escribiendo = true;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      letras.forEach(function (l) { l.classList.add("v"); });
+      setTimeout(leaveDoor, 8000);
+      return;
+    }
+    var i = 0;
+    pluma.classList.add("activa");
+    (function siguiente() {
+      if (leaving) return;
+      if (i >= letras.length) {
+        pluma.classList.remove("activa");
+        setTimeout(leaveDoor, PAUSA_FINAL_MS);
+        return;
+      }
+      var l = letras[i++];
+      l.classList.add("v");
+      moverPluma(l);
+      // pausa un poco más en las comas y los puntos, como al escribir a mano
+      var ch = l.textContent;
+      setTimeout(siguiente, LETRA_MS + (ch === "." ? 450 : ch === "," ? 250 : 0));
+    })();
+  }
 
   // ===== Cuenta regresiva (días y horas), se actualiza cada minuto =====
   function tick() {
@@ -305,8 +359,6 @@
     if (names) {
       $("guest-names").textContent = names;
       $("guest-names").hidden = false;
-      $("card-names").textContent = names;
-      $("card-names").hidden = false;
     }
   }
 
@@ -401,7 +453,7 @@
   function orbitCenter() {
     var el;
     if (!door.hidden) {
-      el = door.classList.contains("open") ? document.querySelector(".env-card .kicker-big") : $("open-door");
+      el = door.classList.contains("open") ? $("card-escrito") : $("open-door");
     } else {
       el = stops[0];
       stops.forEach(function (s) { if (s.getBoundingClientRect().top < window.innerHeight * 0.6) el = s; });

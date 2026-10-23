@@ -135,10 +135,6 @@ a { color: var(--ink); text-underline-offset: 4px; }
 .env-back { position: absolute; inset: 0; border-radius: 4px; background: var(--grain), linear-gradient(180deg, #E2D3BA, #EEE3D1); box-shadow: 0 22px 44px -16px rgba(74,50,22,.38), 0 2px 6px rgba(74,50,22,.12); }
 /* La tarjeta que sale del sobre es la misma portada de la página: mismo papel, monograma, "Nos casamos", foto y texto */
 .env-card { position: absolute; left: 6%; right: 6%; top: 5%; height: 86%; z-index: 1; container-type: inline-size; overflow: hidden; background: linear-gradient(rgba(251,248,243,0.55), rgba(251,248,243,0.55)), url("../assets/boda/bg.jpg") center top / 260% auto, #FBF8F3; border-radius: 3px; box-shadow: 0 3px 14px rgba(74,50,22,.25); display: grid; justify-items: center; align-content: start; gap: 2.4cqw; padding: 7cqw 7cqw 0; text-align: center; }
-.env-card .m { font-family: "Cormorant Garamond", Georgia, serif; font-size: 8cqw; font-weight: 500; letter-spacing: .08em; color: var(--gold-deep); line-height: 1; }
-.env-card .kicker-big { font-size: 15cqw; line-height: 1.15; }
-.env-card .pen { width: 13cqw; }
-.env-card .names-mini { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-weight: 600; font-size: 6.4cqw; line-height: 1.2; color: var(--gold-deep); }
 .env-front { position: absolute; inset: 0; z-index: 2; border-radius: 0 0 4px 4px; clip-path: polygon(0 0, 50% 47%, 100% 0, 100% 100%, 0 100%); background: linear-gradient(170deg, rgba(255,255,255,.12), rgba(120,90,50,.07)), var(--flor) 0 0 / 66px 66px, #F2EBDF; }
 .env-flap { position: absolute; inset: 0; z-index: 4; transform-style: preserve-3d; transform-origin: 50% 0; transform: perspective(1400px) rotateX(0deg); transition: transform 1.5s cubic-bezier(.5,.05,.25,1), z-index 0s linear .75s; }
 .door.open .env-flap { transform: perspective(1400px) rotateX(180deg); z-index: 0; }
@@ -170,13 +166,7 @@ a { color: var(--ink); text-underline-offset: 4px; }
 .kicker-big { font-family: "Pinyon Script", "Snell Roundhand", "Apple Chancery", cursive; font-size: clamp(58px, 16vw, 84px); font-weight: 400; line-height: 1.25; letter-spacing: 0; text-transform: none; color: var(--wine-2); text-align: center; margin: 0; padding: 0 .15em; }
 .kicker-big.write { -webkit-mask-image: linear-gradient(90deg, #000 44%, transparent 56%); mask-image: linear-gradient(90deg, #000 44%, transparent 56%); -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
 .kicker-big.write.go { animation: pen-write 2.2s linear 3.7s forwards; }
-.pen-wrap { position: relative; display: inline-block; }
-.pen { position: absolute; left: -30%; bottom: 14%; width: clamp(46px, 13vw, 64px); aspect-ratio: 1; opacity: 0; pointer-events: none; }
-.pen svg { display: block; width: 100%; height: 100%; transform-origin: 0 100%; animation: pen-bob .28s ease-in-out infinite alternate; filter: drop-shadow(1px 3px 2px rgba(120,90,40,.25)); }
-.pen-wrap.go .pen { animation: pen-move 2.2s linear 3.7s forwards; }
-@keyframes pen-move { 0% { left: -30%; opacity: 0; } 16% { opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 85% { opacity: 0; } 100% { left: 130%; opacity: 0; } }
 @keyframes pen-bob { from { transform: translateY(0) rotate(0deg); } to { transform: translateY(-7px) rotate(-4deg); } }
-@media (prefers-reduced-motion: reduce) { .pen { display: none; } }
 @keyframes pen-write { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .kicker-big.write { -webkit-mask-image: none; mask-image: none; } }
 .ornament { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold-deep); }
@@ -411,8 +401,8 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   --oro: linear-gradient(100deg, #8C6A14 0%, #C9A23A 18%, #EFD27C 34%, #D4AF37 48%, #A8801C 62%, #EBCB6B 80%, #9E7A1E 100%);
   --oro-texto: linear-gradient(100deg, #7A5A0E 0%, #A8801C 30%, #C9A23A 50%, #A8801C 70%, #7A5A0E 100%);
 }
-.monogram, .env-card .m, .kicker-big, .title, .countdown b, .timeline .when, .timeline .what h3,
-.rsvp-event, .done strong, #guest-names, .names-mini, .stepper output {
+.monogram, .kicker-big, .title, .countdown b, .timeline .when, .timeline .what h3,
+.rsvp-event, .done strong, #guest-names, .stepper output {
   background-image: var(--oro);
   background-size: 220% 100%;
   background-position: 0% 0;
@@ -421,7 +411,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
-.monogram, .env-card .m, .kicker-big, .title { animation: oro-destello 7s ease-in-out infinite; }
+.monogram, .kicker-big, .title { animation: oro-destello 7s ease-in-out infinite; }
 .kicker-big.write.go { animation: pen-write 2.2s linear 3.7s forwards, oro-destello 7s ease-in-out infinite; }
 .lead, .gift .v, .timeline .what p, .countdown span, .caps, .gift .k, .rsvp-event span, .done p, .hint, .tally,
 .field > label, .field > .lbl, footer p, blockquote, figcaption, .gift a, #send, .answer-opts span, .btn {
@@ -447,7 +437,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
 .ornament::before, .ornament::after, figure > span[aria-hidden] { background: var(--oro) !important; }
 textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-color: #C9A23A; }
 @keyframes oro-destello { 0%, 55% { background-position: 0% 0; } 80%, 100% { background-position: 100% 0; } }
-@media (prefers-reduced-motion: reduce) { .monogram, .env-card .m, .kicker-big, .title { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .monogram, .kicker-big, .title { animation: none; } }
 
 /* Pétalos de rosa blancos al abrir la tarjeta: por encima del sobre, debajo del pajarito */
 .petalos { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 55; pointer-events: none; }
@@ -561,26 +551,15 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 @media (prefers-reduced-motion: reduce) { .env { animation: none; } }
 
 /* Tarjeta que sale del sobre: frase propia, distinta de la portada */
-.env-card .card-pre, .env-card .card-fecha {
-  font-family: "Montserrat", sans-serif;
-  font-size: 3.4cqw;
-  font-weight: 500;
-  letter-spacing: .28em;
-  text-transform: uppercase;
-  background-image: var(--oro-texto);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-.env-card .kicker-big { font-size: 14cqw; }
-.env-card .card-adorno { font-size: 6cqw; line-height: 1; color: #C9A23A; }
-.env-card .card-frase {
-  max-width: 30ch;
-  font-size: 5.6cqw;
-  font-style: italic;
-  font-weight: 500;
-  line-height: 1.45;
+.env-card .card-adorno { font-size: 7cqw; line-height: 1; color: #C9A23A; }
+/* La frase escrita a pluma: letra cursiva dorada que aparece letra por letra */
+.card-escrito {
+  position: relative;
+  max-width: 100%;
+  font-family: "Pinyon Script", "Snell Roundhand", "Apple Chancery", cursive;
+  font-size: 8.8cqw;
+  line-height: 1.5;
+  text-align: center;
   text-wrap: balance;
   background-image: var(--oro-texto);
   -webkit-background-clip: text;
@@ -588,6 +567,21 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
+.card-escrito .palabra { white-space: nowrap; }
+.card-escrito .letra { opacity: 0; transition: opacity .35s ease; }
+.card-escrito .letra.v { opacity: 1; }
+.card-pluma {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10cqw;
+  aspect-ratio: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .09s linear, opacity .4s ease;
+}
+.card-pluma.activa { opacity: 1; }
+.card-pluma svg { display: block; width: 100%; height: 100%; transform-origin: 0 100%; animation: pen-bob .22s ease-in-out infinite alternate; filter: drop-shadow(1px 3px 2px rgba(120, 90, 40, .25)); }
 /* Dentro del sobre los pétalos quedan detrás de la tarjeta */
 .door .petalos { z-index: 0; }
 .door .env { z-index: 1; }
