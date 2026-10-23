@@ -251,12 +251,9 @@
     s.className = "status" + (isErr ? " err" : "");
   }
 
-  function showDone(count, asiste) {
+  // Al enviar, el botón pasa a "Cambiar respuesta" (sin cartel de confirmación)
+  function showDone() {
     $("send").textContent = "Cambiar respuesta";
-    $("done").classList.add("show");
-    $("done-msg").textContent = asiste === "no"
-      ? "Anotamos que no van a poder asistir. ¡Gracias por avisarnos!"
-      : "Anotamos tu respuesta para " + plural(count) + " en la ceremonia y cena.";
   }
 
   function validate() {
