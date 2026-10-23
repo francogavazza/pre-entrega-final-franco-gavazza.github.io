@@ -38,18 +38,39 @@
   }
   musicBtn.addEventListener("click", function () { setMusic(!musicOn); });
 
+  // Apertura: se levanta la solapa, sale la tarjeta y queda adelante para leerla.
+  // Se pasa a la página al tocar (aparece "Tocá para continuar") o sola después de un rato.
+  var TARJETA_LISTA_MS = 3600;  // cuando la tarjeta ya está adelante
+  var TARJETA_SOLA_MS = 14000;  // si nadie toca, se pasa sola a la página
+  var openedAt = 0;
+  var leaving = false;
+
   function openDoor() {
     if (door.classList.contains("open")) return;
-    door.classList.add("open", "opening");
+    openedAt = performance.now();
+    door.classList.add("open");
     document.querySelector(".kicker-big").classList.add("go");
     document.querySelector(".pen-wrap").classList.add("go");
-    document.body.classList.remove("locked");
     setMusic(true);
     setTimeout(lanzarPetalos, 900);
-    setTimeout(function () { door.hidden = true; }, 6600);
+    setTimeout(leaveDoor, TARJETA_SOLA_MS);
   }
-  $("open-door").addEventListener("click", openDoor);
-  door.addEventListener("click", function (e) { if (e.target === door) openDoor(); });
+
+  function leaveDoor() {
+    if (leaving) return;
+    leaving = true;
+    door.classList.add("saliendo");
+    document.body.classList.remove("locked");
+    // Los pétalos vuelven a caer por delante, sobre la página
+    if (petalCanvas.parentNode === door) document.body.insertBefore(petalCanvas, door.nextSibling);
+    setTimeout(function () { door.hidden = true; }, 1000);
+  }
+
+  $("open-door").addEventListener("click", function (e) { e.stopPropagation(); openDoor(); });
+  door.addEventListener("click", function () {
+    if (!door.classList.contains("open")) openDoor();
+    else if (performance.now() - openedAt > TARJETA_LISTA_MS) leaveDoor();
+  });
   document.body.classList.add("locked");
   if (location.hash !== "#admin") document.querySelector(".kicker-big").classList.add("write");
 
@@ -525,6 +546,8 @@
     resizePetals();
     petalScale = petalCanvas.width / window.innerWidth;
     petalCanvas.hidden = false;
+    // Mientras se lee la tarjeta, los pétalos caen detrás de ella (alrededor del sobre)
+    if (!leaving) door.insertBefore(petalCanvas, door.firstChild);
     for (var i = 0; i < 30; i++) nuevoPetalo(false);
     petalUntil = performance.now() + 6000;
     if (!petalRunning) {
