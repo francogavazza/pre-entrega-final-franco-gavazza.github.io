@@ -139,8 +139,6 @@ a { color: var(--ink); text-underline-offset: 4px; }
 .env-card .m { font-family: "Cormorant Garamond", Georgia, serif; font-size: 8cqw; font-weight: 500; letter-spacing: .08em; color: var(--gold-deep); line-height: 1; }
 .env-card .kicker-big { font-size: 15cqw; line-height: 1.15; }
 .env-card .pen { width: 13cqw; }
-.env-card img { width: 80%; aspect-ratio: 2160 / 1936; object-fit: cover; }
-.env-card .lead-mini { font-size: 5.6cqw; font-weight: 500; line-height: 1.4; color: var(--ink); max-width: 30ch; }
 .env-card .names-mini { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; font-weight: 600; font-size: 6.4cqw; line-height: 1.2; color: var(--gold-deep); }
 .door.open .env-card { animation: card-seq 5.2s cubic-bezier(.4,.1,.3,1) 1.2s forwards; }
 @keyframes card-seq {
@@ -369,7 +367,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
 .answer-opts input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 /* Foto de los novios: los bordes se desvanecen hacia el papel de la tarjeta */
-.foto-novios, .env-card img {
+.foto-novios {
   -webkit-mask-image: radial-gradient(ellipse at center, #000 48%, transparent 71%);
   mask-image: radial-gradient(ellipse at center, #000 48%, transparent 71%);
 }
@@ -580,3 +578,33 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 .door.open .env-cinta { transform: translate(60%, -50%); opacity: 0; }
 .door.open .env-ramito { transform: translate(-50%, -120%) rotate(-12deg); opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .env { animation: none; } }
+
+/* Tarjeta que sale del sobre: frase propia, distinta de la portada */
+.env-card { align-content: center; padding: 6cqw 8cqw; gap: 3cqw; }
+.env-card .card-pre, .env-card .card-fecha {
+  font-family: "Montserrat", sans-serif;
+  font-size: 3.4cqw;
+  font-weight: 500;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  background-image: var(--oro-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.env-card .kicker-big { font-size: 14cqw; }
+.env-card .card-adorno { font-size: 6cqw; line-height: 1; color: #C9A23A; }
+.env-card .card-frase {
+  max-width: 30ch;
+  font-size: 5.6cqw;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.45;
+  text-wrap: balance;
+  background-image: var(--oro-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
