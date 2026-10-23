@@ -525,6 +525,7 @@
   function flyBird(now) {
     var dt = lastTime === null ? 16 : Math.min(now - lastTime, 100);
     lastTime = now;
+    if (explotado) { requestAnimationFrame(flyBird); return; }
     var vw = window.innerWidth;
     var vh = window.innerHeight;
     var w = bird.offsetWidth;
@@ -676,5 +677,84 @@
     resizePetals();
     petalScale = petalCanvas.width / window.innerWidth;
   });
+
+  // ===== Si alguien toca el pajarito: explota en plumas, deja una mancha de tinta en la hoja,
+  // la mancha se desvanece y el pajarito vuelve volando desde arriba =====
+  var explotado = false;
+  var MANCHA_MS = 4500;   // cuánto queda la mancha antes de desvanecerse
+  var VUELVE_MS = 5600;   // cuándo vuelve a aparecer el pajarito
+
+  function manchaSVG() {
+    // una mancha irregular de acuarela azul con gotitas alrededor, distinta cada vez
+    var pts = [], n = 14;
+    for (var i = 0; i < n; i++) {
+      var a = i / n * Math.PI * 2, r = 30 + Math.random() * 16;
+      pts.push([60 + Math.cos(a) * r, 60 + Math.sin(a) * r]);
+    }
+    var d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
+    for (i = 0; i < n; i++) {
+      var p = pts[(i + 1) % n], q = pts[i];
+      d += " Q" + (q[0] + (Math.random() - .5) * 18).toFixed(1) + " " + (q[1] + (Math.random() - .5) * 18).toFixed(1) + " " + p[0].toFixed(1) + " " + p[1].toFixed(1);
+    }
+    var gotas = "";
+    for (i = 0; i < 9; i++) {
+      var ang = Math.random() * Math.PI * 2, dist = 50 + Math.random() * 18, rr = 2 + Math.random() * 4.5;
+      gotas += '<circle cx="' + (60 + Math.cos(ang) * dist).toFixed(1) + '" cy="' + (60 + Math.sin(ang) * dist).toFixed(1) + '" r="' + rr.toFixed(1) + '"/>';
+    }
+    return '<svg viewBox="-10 -10 140 140" aria-hidden="true"><defs><radialGradient id="tinta" cx=".45" cy=".45" r=".6">' +
+      '<stop offset="0" stop-color="#7DB3E8" stop-opacity=".55"/><stop offset=".7" stop-color="#3E7FC6" stop-opacity=".7"/>' +
+      '<stop offset="1" stop-color="#2C5F9E" stop-opacity=".85"/></radialGradient></defs>' +
+      '<path d="' + d + ' Z" fill="url(#tinta)"/><g fill="#3E7FC6" fill-opacity=".75">' + gotas + '</g></svg>';
+  }
+
+  function explotar(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (explotado) return;
+    explotado = true;
+    var r = bird.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    bird.classList.add("oculto");
+
+    // mancha: queda pegada a la hoja (se mueve con la página al bajar)
+    var mancha = document.createElement("div");
+    mancha.className = "mancha";
+    mancha.innerHTML = manchaSVG();
+    var enSobre = !door.hidden;
+    mancha.style.left = (cx + (enSobre ? 0 : window.scrollX)) + "px";
+    mancha.style.top = (cy + (enSobre ? 0 : window.scrollY)) + "px";
+    if (enSobre) mancha.style.position = "fixed";
+    document.body.appendChild(mancha);
+    setTimeout(function () { mancha.classList.add("seca"); }, MANCHA_MS);
+    setTimeout(function () { mancha.remove(); }, MANCHA_MS + 1600);
+
+    // plumitas que salen volando para todos lados
+    for (var i = 0; i < 16; i++) {
+      var pl = document.createElement("span");
+      pl.className = "pluma-pajaro";
+      pl.style.left = cx + "px";
+      pl.style.top = cy + "px";
+      pl.style.background = ["#5B9BE0", "#8FC1F0", "#3E7FC6", "#EEF5FC", "#C9A23A"][i % 5];
+      document.body.appendChild(pl);
+      var ang = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 70;
+      var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist;
+      pl.animate([
+        { transform: "translate(-50%,-50%) rotate(0deg)", opacity: 1 },
+        { transform: "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) rotate(" + (Math.random() * 360) + "deg)", opacity: 1, offset: .45 },
+        { transform: "translate(calc(-50% + " + (dx * 1.2) + "px), calc(-50% + " + (dy + 90) + "px)) rotate(" + (Math.random() * 720) + "deg)", opacity: 0 }
+      ], { duration: 1500 + Math.random() * 600, easing: "cubic-bezier(.2,.7,.4,1)", fill: "forwards" });
+      setTimeout((function (el) { return function () { el.remove(); }; })(pl), 2300);
+    }
+
+    // vuelve volando desde arriba de la pantalla
+    setTimeout(function () {
+      var t = orbitCenter();
+      centerX = t[0];
+      centerY = -120;
+      explotado = false;
+      bird.classList.remove("oculto");
+    }, VUELVE_MS);
+  }
+  bird.addEventListener("click", explotar);
 
 })();
