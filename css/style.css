@@ -568,8 +568,26 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   -webkit-text-fill-color: transparent;
 }
 .card-escrito .palabra { white-space: nowrap; }
-.card-escrito .letra { opacity: 0; transition: opacity .35s ease; }
-.card-escrito .letra.v { opacity: 1; }
+.card-escrito .letra {
+  display: inline-block;
+  /* margen invisible alrededor de cada letra para que los rulos y puntos de la cursiva no se corten */
+  padding: .6em .3em;
+  margin: -.6em -.3em;
+  opacity: 0;
+  /* cada letra lleva su parte del mismo degradado dorado (la posición la fija el JS) */
+  background-image: var(--oro-texto);
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+/* La tinta aparece de izquierda a derecha, al ritmo de la pluma */
+.card-escrito .letra.v { opacity: 1; animation: tinta var(--d, 75ms) linear both; }
+@keyframes tinta {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
 .card-pluma {
   position: absolute;
   left: 0;
@@ -578,10 +596,11 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   aspect-ratio: 1;
   opacity: 0;
   pointer-events: none;
-  transition: transform .09s linear, opacity .4s ease;
+  transform-origin: 3.1% 96.9%;
+  transition: opacity .4s ease;
 }
 .card-pluma.activa { opacity: 1; }
-.card-pluma svg { display: block; width: 100%; height: 100%; transform-origin: 0 100%; animation: pen-bob .22s ease-in-out infinite alternate; filter: drop-shadow(1px 3px 2px rgba(120, 90, 40, .25)); }
+.card-pluma svg { display: block; width: 100%; height: 100%; filter: drop-shadow(1px 3px 2px rgba(120, 90, 40, .25)); }
 /* Dentro del sobre los pétalos quedan detrás de la tarjeta */
 .door .petalos { z-index: 0; }
 .door .env { z-index: 1; }
