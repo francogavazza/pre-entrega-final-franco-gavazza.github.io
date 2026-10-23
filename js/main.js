@@ -81,6 +81,7 @@
   // después se van mostrando una por una y la pluma sigue a la última. Al terminar se abre la página.
   var escrito = $("card-escrito");
   var pluma = $("card-pluma");
+  var adorno = document.querySelector(".env-card .card-adorno");
   var letras = [];
   FRASE.split(" ").forEach(function (palabra, i) {
     if (i) escrito.appendChild(document.createTextNode(" "));
@@ -105,15 +106,35 @@
       "px) rotate(" + giro.toFixed(1) + "deg)";
   }
 
-  function trazarLetra(l, dur, listo) {
-    // la letra tiene un margen invisible (padding) alrededor: se descuenta para ubicar la pluma
+  // Dónde está cada letra dentro de la tarjeta (la letra tiene un margen invisible que se descuenta)
+  function medirLetra(l) {
     var cs = getComputedStyle(l);
     var px = parseFloat(cs.paddingLeft), py = parseFloat(cs.paddingTop);
     var ancho = l.offsetWidth - 2 * px, altoLetra = l.offsetHeight - 2 * py;
     var x0 = escrito.offsetLeft + l.offsetLeft + px;
-    var x1 = x0 + ancho;
-    var base = escrito.offsetTop + l.offsetTop + py + altoLetra * 0.72;
-    var alto = altoLetra * 0.32;
+    return { x0: x0, x1: x0 + ancho, base: escrito.offsetTop + l.offsetTop + py + altoLetra * 0.72, alto: altoLetra * 0.32 };
+  }
+
+  // La pluma llega desde arriba, se apoya sobre la primera letra y recién ahí empieza a escribir
+  function apoyarPluma(l, listo) {
+    var m = medirLetra(l);
+    var desde = { x: m.x0 + 46, y: m.base - 80 };
+    var dur = 1100;
+    var t0 = performance.now();
+    pluma.classList.add("activa");
+    (function cuadro(now) {
+      if (leaving) return;
+      var k = Math.min(1, (now - t0) / dur);
+      var e = 1 - Math.pow(1 - k, 3);
+      ponerPluma(desde.x + (m.x0 - desde.x) * e, desde.y + (m.base - desde.y) * e, -24 + 18 * e);
+      if (k < 1) requestAnimationFrame(cuadro);
+      else setTimeout(listo, 280);
+    })(t0);
+  }
+
+  function trazarLetra(l, dur, listo) {
+    var m = medirLetra(l);
+    var x0 = m.x0, x1 = m.x1, base = m.base, alto = m.alto;
     l.style.backgroundSize = escrito.offsetWidth + "px " + escrito.offsetHeight + "px";
     l.style.backgroundPosition = -l.offsetLeft + "px " + -l.offsetTop + "px";
     l.style.setProperty("--d", dur + "ms");
@@ -139,11 +160,11 @@
       return;
     }
     var i = 0;
-    pluma.classList.add("activa");
-    (function siguiente() {
+    apoyarPluma(letras[0], function siguiente() {
       if (leaving) return;
       if (i >= letras.length) {
         pluma.classList.remove("activa");
+        adorno.classList.add("v");
         setTimeout(leaveDoor, PAUSA_FINAL_MS);
         return;
       }
@@ -156,7 +177,7 @@
         if (prox && prox.parentNode !== l.parentNode) pausa += 60;
         setTimeout(siguiente, pausa);
       });
-    })();
+    });
   }
 
   // ===== Cuenta regresiva (días y horas), se actualiza cada minuto =====
