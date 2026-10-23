@@ -61,8 +61,9 @@
     leaving = true;
     door.classList.add("saliendo");
     document.body.classList.remove("locked");
-    // Los pétalos vuelven a caer por delante, sobre la página
+    // Los pétalos pasan a caer por delante, sobre la página, y cae una nueva lluvia al abrirse la página
     if (petalCanvas.parentNode === door) document.body.insertBefore(petalCanvas, door.nextSibling);
+    lanzarPetalos();
     setTimeout(function () { door.hidden = true; }, 1000);
   }
 
