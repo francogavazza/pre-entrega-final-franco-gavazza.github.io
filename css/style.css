@@ -187,34 +187,35 @@ section { display: grid; gap: 22px; }
 
 /* Línea de tiempo del día */
 /* Cronograma: dos arcos con doble filete dorado, uno al lado del otro */
-.timeline { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
-.timeline li {
-  list-style: none;
+/* Cronograma: un solo arco con doble filete dorado y los dos días adentro */
+.timeline {
   position: relative;
   display: grid;
-  align-content: start;
   justify-items: center;
-  gap: 10px;
-  padding: 30px 12px 22px;
+  gap: 14px;
+  width: min(100%, 360px);
+  margin: 0 auto;
+  padding: 40px 22px 30px;
   text-align: center;
   border: 1px solid #C9A23A;
   border-radius: 999px 999px 6px 6px;
   background: rgba(255, 255, 255, .45);
 }
-.timeline li::before {
+.timeline::before {
   content: "";
   position: absolute;
-  inset: 5px;
+  inset: 6px;
   border: 1px solid rgba(201, 162, 58, .55);
   border-radius: 999px 999px 3px 3px;
   pointer-events: none;
 }
-.timeline .when { font-size: 48px; font-weight: 500; line-height: 1; text-align: center; font-variant-numeric: lining-nums; }
-.timeline .when small { display: block; margin-top: 6px; font-family: "Montserrat", system-ui, sans-serif; font-size: 12px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase; }
-.timeline .when::after { content: "❦"; display: block; margin-top: 8px; font-family: "Cormorant Garamond", serif; font-size: 18px; line-height: 1; }
-.timeline .what { display: grid; gap: 6px; justify-items: center; }
-.timeline .what h3 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.2; }
-.timeline .what p { font-size: 18px; line-height: 1.35; }
+.timeline .when { font-size: 46px; font-weight: 500; line-height: 1; font-style: italic; }
+.timeline .when small { display: block; margin-top: 8px; font-family: "Montserrat", system-ui, sans-serif; font-size: 12px; font-style: normal; font-weight: 500; letter-spacing: .3em; }
+.timeline .evento { display: grid; gap: 4px; justify-items: center; }
+.timeline .fecha { font-family: "Montserrat", system-ui, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
+.timeline .evento h3 { margin: 0; font-size: 24px; font-weight: 600; line-height: 1.2; }
+.timeline .evento p { font-size: 19px; line-height: 1.3; }
+.timeline .separador { font-size: 20px; line-height: 1; color: #C9A23A; }
 
 /* Paradas del día (en tarjetas crema) */
 .stops { display: grid; gap: 40px; }
@@ -401,7 +402,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   --oro: linear-gradient(100deg, #8C6A14 0%, #C9A23A 18%, #EFD27C 34%, #D4AF37 48%, #A8801C 62%, #EBCB6B 80%, #9E7A1E 100%);
   --oro-texto: linear-gradient(100deg, #7A5A0E 0%, #A8801C 30%, #C9A23A 50%, #A8801C 70%, #7A5A0E 100%);
 }
-.monogram, .kicker-big, .title, .countdown b, .timeline .when, .timeline .what h3,
+.monogram, .kicker-big, .title, .countdown b, .timeline .when, .timeline .evento h3,
 .rsvp-event, .done strong, #guest-names, .stepper output {
   background-image: var(--oro);
   background-size: 220% 100%;
@@ -413,7 +414,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
 }
 .monogram, .kicker-big, .title { animation: oro-destello 7s ease-in-out infinite; }
 .kicker-big.write.go { animation: pen-write 2.2s linear 3.7s forwards, oro-destello 7s ease-in-out infinite; }
-.lead, .gift .v, .timeline .what p, .countdown span, .caps, .gift .k, .rsvp-event span, .done p, .hint, .tally,
+.lead, .gift .v, .timeline .evento p, .timeline .fecha, .timeline .when small, .countdown span, .caps, .gift .k, .rsvp-event span, .done p, .hint, .tally,
 .field > label, .field > .lbl, footer p, blockquote, figcaption, .gift a, #send, .answer-opts span, .btn {
   background-image: var(--oro-texto);
   -webkit-background-clip: text;
@@ -445,7 +446,7 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 /* Link "Ver ubicación" en el cronograma */
 .timeline .mapa {
   justify-self: center;
-  margin-top: 4px;
+  margin-top: 6px;
   white-space: nowrap;
   font-family: "Montserrat", sans-serif;
   font-size: 11px;
@@ -466,9 +467,6 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 .door[hidden], .petalos[hidden], .pajarito[hidden] { display: none !important; }
 
 /* Los dos "Ver ubicación" quedan alineados abajo de cada arco */
-.timeline li { grid-template-rows: auto 1fr; }
-.timeline .what { height: 100%; grid-template-rows: auto auto 1fr; }
-.timeline .mapa { align-self: end; }
 
 /* ---------- Sobre de la foto: papel de algodón con solapa troquelada en relieve ----------
    La misma foto se usa dos veces: el bolsillo (todo menos la solapa) y la solapa, que gira desde
