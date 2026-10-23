@@ -788,7 +788,7 @@
     for (var i = 0; i < 5; i++) {
       p += '<ellipse cx="20" cy="10.5" rx="6.6" ry="9.2" transform="rotate(' + (i * 72 + t) + ' 20 20)"/>';
     }
-    return '<svg viewBox="0 0 40 40"><g fill="url(#petalo)" stroke="#D9D2C6" stroke-width=".6">' + p + '</g>' +
+    return '<svg viewBox="0 0 40 40"><g fill="url(#petalo)" stroke="#C9BFAF" stroke-width=".8">' + p + '</g>' +
       '<circle cx="20" cy="20" r="4.2" fill="#E9CF7A"/><g fill="#B8902F">' +
       '<circle cx="18.6" cy="18.8" r=".9"/><circle cx="21.4" cy="19" r=".9"/><circle cx="20" cy="21.6" r=".9"/></g></svg>';
   }
