@@ -10,7 +10,7 @@
   var ARTIFACT_URL = "https://claude.ai/artifact/EhYXrakUV9p9SFZaMFQmXk";
   // Planilla de Google donde se anotan todas las confirmaciones (URL de la app web de Apps Script,
   // ver planilla/README.md). Vacío: en GitHub Pages las confirmaciones se mandan por WhatsApp.
-  var SHEET_URL = "";
+  var SHEET_URL = "https://script.google.com/macros/s/AKfycbwysCg5Sy08qex3t0cPMm1tuBpSeGsvtdDTH-VhxfpWbVkaZmd6VRBbm4oW9n79CL6U/exec";
 
   var $ = function (id) { return document.getElementById(id); };
   var hasClaude = !!(window.claude && window.claude.use);
@@ -218,7 +218,7 @@
     window.open("https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(text), "_blank", "noopener");
   }
 
-  // En GitHub Pages (sin base de datos): se anota en la planilla o, si no hay planilla, se manda por WhatsApp
+  // Con planilla (en los dos links): se anota ahí. Sin planilla, en GitHub Pages se manda por WhatsApp
   function submitStatic() {
     if (!validate()) return;
     var count = countPeople();
@@ -244,7 +244,9 @@
     });
   }
 
-  if (hasClaude) {
+  // Con planilla, todas las respuestas van a la planilla (también desde el link de Claude, donde
+  // los invitados sin cuenta no pueden guardar en la base del artefacto)
+  if (hasClaude && !SHEET_URL) {
     Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function (res) {
       db = res[0];
       var user = res[1];
