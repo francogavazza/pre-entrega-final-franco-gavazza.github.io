@@ -558,26 +558,6 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   from { transform: translateY(-22%) scale(1); z-index: 6; }
   to { transform: translateY(-22%) scale(1.4); z-index: 6; }
 }
-/* "Tocá para continuar": aparece cuando la tarjeta ya se puede leer */
-.door-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: max(28px, env(safe-area-inset-bottom, 0px));
-  margin: 0;
-  text-align: center;
-  font-family: "Montserrat", sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  color: #A8801C;
-  opacity: 0;
-  pointer-events: none;
-}
-.door.open .door-hint { animation: aviso-aparece 1s ease 5.8s forwards, aviso-late 2.4s ease-in-out 6.8s infinite; }
-@keyframes aviso-aparece { to { opacity: 1; } }
-@keyframes aviso-late { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 @media (prefers-reduced-motion: reduce) { .env { animation: none; } }
 
 /* Tarjeta que sale del sobre: frase propia, distinta de la portada */
