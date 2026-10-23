@@ -494,3 +494,89 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 .timeline li { grid-template-rows: auto 1fr; }
 .timeline .what { height: 100%; grid-template-rows: auto auto 1fr; }
 .timeline .mapa { align-self: end; }
+
+/* ---------- Sobre más real: mesa de lino, papel con grano, lámina de oro, cinta de seda y ramito ---------- */
+.door {
+  background:
+    radial-gradient(120% 70% at 50% 45%, rgba(255, 255, 255, .55), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='l'><feTurbulence type='fractalNoise' baseFrequency='.9 .045' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .32 0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23l)'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='l'><feTurbulence type='fractalNoise' baseFrequency='.045 .9' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .32 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23l)'/></svg>"),
+    radial-gradient(130% 100% at 30% 15%, #FBF7F0 0%, #EFE5D6 50%, #DDCDB3 100%);
+}
+.env { width: min(88vw, 400px, 62vh); animation: sobre-respira 7s ease-in-out infinite; }
+.door.open .env { animation-play-state: paused; }
+@keyframes sobre-respira {
+  0%, 100% { rotate: -.7deg; translate: 0 0; }
+  50% { rotate: .5deg; translate: 0 -4px; }
+}
+.env-back {
+  box-shadow:
+    0 1px 2px rgba(74, 50, 22, .12),
+    0 14px 26px -12px rgba(74, 50, 22, .32),
+    0 40px 70px -30px rgba(74, 50, 22, .38);
+}
+/* Grano de papel de algodón y luz que viene de arriba a la izquierda */
+.env-front {
+  background:
+    var(--grain),
+    linear-gradient(160deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 45%, rgba(110, 80, 40, .08)),
+    var(--flor) 0 0 / 66px 66px,
+    #F3ECE0;
+}
+.env-flap .front {
+  background:
+    var(--grain),
+    linear-gradient(180deg, rgba(255, 255, 255, .3), rgba(120, 90, 50, .06)),
+    var(--flor) 33px 0 / 66px 66px,
+    #F4EDE2;
+}
+/* Forro interior: champagne con el mismo floreado en oro */
+.env-flap .back {
+  background:
+    var(--grain),
+    linear-gradient(0deg, rgba(120, 90, 50, .16), rgba(255, 255, 255, .05)),
+    var(--flor) 0 0 / 44px 44px,
+    #EADBC0;
+}
+/* Cinta de seda que rodea el sobre a la altura del sello */
+.env-cinta {
+  position: absolute;
+  left: -2.5%;
+  right: -2.5%;
+  top: 56%;
+  height: 7.5%;
+  z-index: 5;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background:
+    linear-gradient(90deg, rgba(90, 70, 40, .28), transparent 4%, transparent 96%, rgba(90, 70, 40, .28)),
+    linear-gradient(180deg, #E7DCCB 0%, #FFFCF6 30%, #F1E7D8 52%, #FFFDF8 70%, #DCCFBA 100%);
+  box-shadow: 0 2px 3px rgba(60, 40, 20, .16), 0 6px 10px -6px rgba(60, 40, 20, .25);
+  transition: transform .7s cubic-bezier(.5, 0, .7, .3), opacity .6s ease;
+}
+.env-cinta::before, .env-cinta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(201, 162, 58, .55);
+}
+.env-cinta::before { top: 14%; }
+.env-cinta::after { bottom: 14%; }
+.env-ramito {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  width: 104%;
+  z-index: 6;
+  transform: translate(-50%, -54%);
+  filter: drop-shadow(0 2px 2px rgba(60, 40, 20, .18));
+  pointer-events: none;
+  transition: transform .7s cubic-bezier(.5, 0, .7, .3), opacity .6s ease;
+}
+.env .seal { z-index: 7; filter: drop-shadow(0 6px 6px rgba(70, 45, 15, .35)); }
+/* Al abrir: la cinta se desliza hacia un costado y el ramito sale hacia arriba, después se abre la tapa */
+.door.open .env-cinta { transform: translate(60%, -50%); opacity: 0; }
+.door.open .env-ramito { transform: translate(-50%, -120%) rotate(-12deg); opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .env { animation: none; } }
