@@ -42,7 +42,7 @@
   // Se pasa a la página al tocar la pantalla o sola después de un rato.
   var TARJETA_LISTA_MS = 3600;  // cuando la tarjeta ya está adelante
   var TARJETA_SOLA_MS = 40000;  // por las dudas: si algo falla, igual se pasa a la página
-  var FRASE = "Dos historias que se cruzaron y decidieron empezar a escribirse juntas. Nos gustaría que seas parte de este nuevo capítulo.";
+  var FRASE = "Un día dos historias se cruzaron y decidieron empezar a escribirse juntas. Nos gustaría que seas parte de este nuevo capítulo.";
   var LETRA_MS = 125;           // velocidad de la pluma (milisegundos por letra)
   var PAUSA_FINAL_MS = 2200;    // cuánto queda la frase completa antes de abrir la página
   var openedAt = 0;
