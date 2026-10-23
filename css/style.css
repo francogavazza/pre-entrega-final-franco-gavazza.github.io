@@ -366,6 +366,10 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   pointer-events: none;
   will-change: transform;
 }
+/* Se puede tocar solo el pajarito (con un poco de margen para el dedo) */
+.pajarito .pajaro { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pajarito .pajaro::after { content: ""; position: absolute; inset: -12px; }
+.pajarito.oculto { visibility: hidden; }
 .pajarito-vuelo { animation: pajarito-flota 2.4s ease-in-out infinite; transition: transform .35s ease; }
 .pajarito.izquierda .pajarito-vuelo { transform: scaleX(-1); }
 .pajaro { position: relative; aspect-ratio: 684 / 631; filter: drop-shadow(0 3px 3px rgba(40, 60, 90, .2)); }
@@ -616,3 +620,28 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   100% { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) { .countdown b.cambia { animation: none; } }
+
+/* Explosión del pajarito: mancha de tinta azul y plumitas */
+.mancha {
+  position: absolute;
+  z-index: 58;
+  width: 150px;
+  height: 150px;
+  transform: translate(-50%, -50%) scale(.2) rotate(0deg);
+  pointer-events: none;
+  animation: mancha-salpica .35s cubic-bezier(.2, 1.4, .4, 1) forwards;
+  transition: opacity 1.5s ease;
+  mix-blend-mode: multiply;
+}
+.mancha svg { display: block; width: 100%; height: 100%; }
+.mancha.seca { opacity: 0; }
+@keyframes mancha-salpica { to { transform: translate(-50%, -50%) scale(1) rotate(12deg); } }
+.pluma-pajaro {
+  position: fixed;
+  z-index: 61;
+  width: 7px;
+  height: 14px;
+  border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+  pointer-events: none;
+  box-shadow: 0 1px 2px rgba(40, 60, 90, .25);
+}
