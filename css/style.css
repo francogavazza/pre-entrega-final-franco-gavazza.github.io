@@ -592,7 +592,7 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   position: absolute;
   left: 0;
   top: 0;
-  width: 10cqw;
+  width: 17cqw;
   aspect-ratio: 1;
   opacity: 0;
   pointer-events: none;
