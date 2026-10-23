@@ -118,8 +118,8 @@
   // La pluma llega desde arriba, se apoya sobre la primera letra y recién ahí empieza a escribir
   function apoyarPluma(l, listo) {
     var m = medirLetra(l);
-    var desde = { x: m.x0 + 46, y: m.base - 80 };
-    var dur = 1100;
+    var desde = { x: escrito.offsetLeft + escrito.offsetWidth * 0.85, y: escrito.offsetTop - 120 };
+    var dur = 1600;
     var t0 = performance.now();
     pluma.classList.add("activa");
     (function cuadro(now) {
@@ -128,7 +128,7 @@
       var e = 1 - Math.pow(1 - k, 3);
       ponerPluma(desde.x + (m.x0 - desde.x) * e, desde.y + (m.base - desde.y) * e, -24 + 18 * e);
       if (k < 1) requestAnimationFrame(cuadro);
-      else setTimeout(listo, 280);
+      else setTimeout(listo, 450);
     })(t0);
   }
 
