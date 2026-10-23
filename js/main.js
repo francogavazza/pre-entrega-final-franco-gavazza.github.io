@@ -41,7 +41,7 @@
   // Apertura: se levanta la solapa, sale la tarjeta y queda adelante para leerla.
   // Se pasa a la página al tocar la pantalla o sola después de un rato.
   var TARJETA_LISTA_MS = 3600;  // cuando la tarjeta ya está adelante
-  var TARJETA_SOLA_MS = 14000;  // si nadie toca, se pasa sola a la página
+  var TARJETA_SOLA_MS = 24000;  // si nadie toca, se pasa sola a la página (unos 20 s de lectura)
   var openedAt = 0;
   var leaving = false;
 
