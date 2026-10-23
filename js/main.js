@@ -812,12 +812,15 @@
     function rnd() { semilla = (semilla * 9301 + 49297) % 233280; return semilla / 233280; }
     while (s < total) {
       var d = densidad(s), pt = punto(s);
-      var hoja = document.createElement("span");
-      hoja.className = "flor-arco hoja-arco";
-      hoja.innerHTML = hojaSVG();
       var lado = i % 2 ? 1 : -1;
-      hoja.style.cssText = "left:" + pt.x + "px;top:" + pt.y + "px;transform:translate(-50%,-50%) rotate(" + (pt.ang + 90 + lado * (30 + rnd() * 30)) + "deg) translateX(" + (10 + rnd() * 6) + "px)";
-      arco.appendChild(hoja);
+      var conHoja = rnd() < .45;  // menos hojas: más o menos una cada dos flores
+      if (conHoja) {
+        var hoja = document.createElement("span");
+        hoja.className = "flor-arco hoja-arco";
+        hoja.innerHTML = hojaSVG();
+        hoja.style.cssText = "left:" + pt.x + "px;top:" + pt.y + "px;transform:translate(-50%,-50%) rotate(" + (pt.ang + 90 + lado * (30 + rnd() * 30)) + "deg) translateX(" + (10 + rnd() * 6) + "px)";
+        arco.appendChild(hoja);
+      }
       if (rnd() < Math.min(1, d * 1.2)) {
         var tam = 18 + rnd() * 14 + Math.min(d, 1.3) * 9;
         var flor = document.createElement("span");
