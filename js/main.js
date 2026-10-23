@@ -684,27 +684,42 @@
   var MANCHA_MS = 4500;   // cuánto queda la mancha antes de desvanecerse
   var VUELVE_MS = 5600;   // cuándo vuelve a aparecer el pajarito
 
+  // Salpicadura de sangre: mancha central irregular, gotas alargadas que salen disparadas
+  // y chorreados que bajan, con brillo húmedo. La forma es distinta cada vez.
   function manchaSVG() {
-    // una mancha irregular de acuarela azul con gotitas alrededor, distinta cada vez
-    var pts = [], n = 14;
-    for (var i = 0; i < n; i++) {
-      var a = i / n * Math.PI * 2, r = 30 + Math.random() * 16;
-      pts.push([60 + Math.cos(a) * r, 60 + Math.sin(a) * r]);
+    var R = function (a, b) { return a + Math.random() * (b - a); };
+    var pts = [], n = 18, i;
+    for (i = 0; i < n; i++) {
+      var a = i / n * Math.PI * 2, r = R(22, 38);
+      pts.push([80 + Math.cos(a) * r, 80 + Math.sin(a) * r * 0.9]);
     }
     var d = "M" + pts[0][0].toFixed(1) + " " + pts[0][1].toFixed(1);
     for (i = 0; i < n; i++) {
       var p = pts[(i + 1) % n], q = pts[i];
-      d += " Q" + (q[0] + (Math.random() - .5) * 18).toFixed(1) + " " + (q[1] + (Math.random() - .5) * 18).toFixed(1) + " " + p[0].toFixed(1) + " " + p[1].toFixed(1);
+      d += " Q" + (q[0] + R(-9, 9)).toFixed(1) + " " + (q[1] + R(-9, 9)).toFixed(1) + " " + p[0].toFixed(1) + " " + p[1].toFixed(1);
     }
-    var gotas = "";
-    for (i = 0; i < 9; i++) {
-      var ang = Math.random() * Math.PI * 2, dist = 50 + Math.random() * 18, rr = 2 + Math.random() * 4.5;
-      gotas += '<circle cx="' + (60 + Math.cos(ang) * dist).toFixed(1) + '" cy="' + (60 + Math.sin(ang) * dist).toFixed(1) + '" r="' + rr.toFixed(1) + '"/>';
+    var extra = "";
+    // gotas disparadas (alargadas, apuntando hacia afuera)
+    for (i = 0; i < 14; i++) {
+      var ang = R(0, Math.PI * 2), dist = R(44, 76), rr = R(1.6, 5.5);
+      var gx = 80 + Math.cos(ang) * dist, gy = 80 + Math.sin(ang) * dist;
+      extra += '<ellipse cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" rx="' + (rr * R(1.2, 2.2)).toFixed(1) + '" ry="' + rr.toFixed(1) +
+        '" transform="rotate(' + (ang * 180 / Math.PI).toFixed(0) + ' ' + gx.toFixed(1) + ' ' + gy.toFixed(1) + ')"/>';
     }
-    return '<svg viewBox="-10 -10 140 140" aria-hidden="true"><defs><radialGradient id="tinta" cx=".45" cy=".45" r=".6">' +
-      '<stop offset="0" stop-color="#7DB3E8" stop-opacity=".55"/><stop offset=".7" stop-color="#3E7FC6" stop-opacity=".7"/>' +
-      '<stop offset="1" stop-color="#2C5F9E" stop-opacity=".85"/></radialGradient></defs>' +
-      '<path d="' + d + ' Z" fill="url(#tinta)"/><g fill="#3E7FC6" fill-opacity=".75">' + gotas + '</g></svg>';
+    // chorreados que caen desde abajo de la mancha
+    var chorros = "";
+    for (i = 0; i < 3; i++) {
+      var x = R(62, 98), largo = R(30, 62), ancho = R(3, 6.5), y0 = R(98, 106);
+      chorros += '<path class="chorro" style="animation-delay:' + R(.2, .7).toFixed(2) + 's" d="M' + (x - ancho / 2).toFixed(1) + ' ' + (y0 - 6).toFixed(1) +
+        ' L' + (x - ancho / 2).toFixed(1) + ' ' + (y0 + largo).toFixed(1) + ' a' + (ancho / 2).toFixed(1) + ' ' + (ancho / 1.6).toFixed(1) + ' 0 0 0 ' + ancho.toFixed(1) + ' 0 L' +
+        (x + ancho / 2).toFixed(1) + ' ' + (y0 - 6).toFixed(1) + ' Z"/>';
+    }
+    return '<svg viewBox="0 0 160 200" aria-hidden="true"><defs>' +
+      '<radialGradient id="sangre" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#B3121C"/><stop offset=".6" stop-color="#8A0A12"/><stop offset="1" stop-color="#5C0409"/></radialGradient>' +
+      '<filter id="humedo"><feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="b"/><feSpecularLighting in="b" surfaceScale="3" specularConstant=".9" specularExponent="22" lighting-color="#fff" result="s">' +
+      '<fePointLight x="40" y="20" z="90"/></feSpecularLighting><feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/>' +
+      '<feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".55" k4="0"/></filter></defs>' +
+      '<g filter="url(#humedo)" fill="url(#sangre)"><g class="chorros">' + chorros + '</g><path d="' + d + ' Z"/>' + extra + '</g></svg>';
   }
 
   function explotar(e) {
@@ -728,22 +743,28 @@
     setTimeout(function () { mancha.classList.add("seca"); }, MANCHA_MS);
     setTimeout(function () { mancha.remove(); }, MANCHA_MS + 1600);
 
-    // plumitas que salen volando para todos lados
-    for (var i = 0; i < 16; i++) {
+    // plumitas que se le escapan: salen disparadas y después caen meciéndose despacio
+    for (var i = 0; i < 12; i++) {
       var pl = document.createElement("span");
       pl.className = "pluma-pajaro";
+      pl.innerHTML = '<svg viewBox="0 0 12 30"><path d="M6 29 C6 20 6 10 6 1" stroke="#7C8FA6" stroke-width=".7" fill="none"/>' +
+        '<path d="M6 2 C10 6 11.5 13 10 20 C9 24 7.5 26 6 27 C4.5 26 3 24 2 20 C.5 13 2 6 6 2 Z" fill="' +
+        ["#5B9BE0", "#8FC1F0", "#3E7FC6", "#EEF5FC"][i % 4] + '" fill-opacity=".95"/></svg>';
       pl.style.left = cx + "px";
       pl.style.top = cy + "px";
-      pl.style.background = ["#5B9BE0", "#8FC1F0", "#3E7FC6", "#EEF5FC", "#C9A23A"][i % 5];
       document.body.appendChild(pl);
-      var ang = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 70;
-      var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist;
-      pl.animate([
-        { transform: "translate(-50%,-50%) rotate(0deg)", opacity: 1 },
-        { transform: "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) rotate(" + (Math.random() * 360) + "deg)", opacity: 1, offset: .45 },
-        { transform: "translate(calc(-50% + " + (dx * 1.2) + "px), calc(-50% + " + (dy + 90) + "px)) rotate(" + (Math.random() * 720) + "deg)", opacity: 0 }
-      ], { duration: 1500 + Math.random() * 600, easing: "cubic-bezier(.2,.7,.4,1)", fill: "forwards" });
-      setTimeout((function (el) { return function () { el.remove(); }; })(pl), 2300);
+      var ang = Math.random() * Math.PI * 2, dist = 30 + Math.random() * 50;
+      var dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist - 20;
+      var lado = Math.random() < .5 ? -1 : 1, caida = 160 + Math.random() * 140, giro = Math.random() * 360;
+      var frames = [{ transform: "translate(-50%,-50%) rotate(" + giro + "deg)", opacity: 1 }];
+      frames.push({ transform: "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) rotate(" + (giro + 120) + "deg)", opacity: 1, offset: .15 });
+      for (var k = 1; k <= 4; k++) {
+        lado = -lado;
+        frames.push({ transform: "translate(calc(-50% + " + (dx + lado * 22) + "px), calc(-50% + " + (dy + caida * k / 4) + "px)) rotate(" + (lado * 35) + "deg)",
+          opacity: k === 4 ? 0 : 1, offset: .15 + .85 * k / 4 });
+      }
+      pl.animate(frames, { duration: 3200 + Math.random() * 1400, easing: "ease-in-out", fill: "forwards" });
+      setTimeout((function (el) { return function () { el.remove(); }; })(pl), 4800);
     }
 
     // vuelve volando desde arriba de la pantalla

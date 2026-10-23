@@ -621,27 +621,28 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 }
 @media (prefers-reduced-motion: reduce) { .countdown b.cambia { animation: none; } }
 
-/* Explosión del pajarito: mancha de tinta azul y plumitas */
+/* Muerte del pajarito: salpicadura de sangre y plumitas que caen */
 .mancha {
   position: absolute;
   z-index: 58;
-  width: 150px;
-  height: 150px;
-  transform: translate(-50%, -50%) scale(.2) rotate(0deg);
+  width: 140px;
+  height: 175px;
+  transform: translate(-50%, -40%) scale(.15) rotate(0deg);
   pointer-events: none;
-  animation: mancha-salpica .35s cubic-bezier(.2, 1.4, .4, 1) forwards;
-  transition: opacity 1.5s ease;
-  mix-blend-mode: multiply;
+  animation: mancha-salpica .22s cubic-bezier(.2, 1.5, .4, 1) forwards;
+  transition: opacity 1.6s ease;
 }
-.mancha svg { display: block; width: 100%; height: 100%; }
+.mancha svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.mancha .chorro { transform-box: fill-box; transform-origin: top; transform: scaleY(0); animation: chorrea 2.4s cubic-bezier(.4, 0, .6, 1) forwards; }
 .mancha.seca { opacity: 0; }
-@keyframes mancha-salpica { to { transform: translate(-50%, -50%) scale(1) rotate(12deg); } }
+@keyframes mancha-salpica { to { transform: translate(-50%, -40%) scale(1) rotate(0deg); } }
+@keyframes chorrea { to { transform: scaleY(1); } }
 .pluma-pajaro {
   position: fixed;
   z-index: 61;
-  width: 7px;
-  height: 14px;
-  border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+  width: 9px;
+  height: 22px;
   pointer-events: none;
-  box-shadow: 0 1px 2px rgba(40, 60, 90, .25);
+  filter: drop-shadow(0 1px 1px rgba(40, 60, 90, .25));
 }
+.pluma-pajaro svg { display: block; width: 100%; height: 100%; }
