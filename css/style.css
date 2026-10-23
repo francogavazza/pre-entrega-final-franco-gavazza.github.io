@@ -561,9 +561,7 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   line-height: 1.5;
   text-align: center;
   text-wrap: balance;
-  background-image: var(--oro-texto);
-  -webkit-background-clip: text;
-  background-clip: text;
+  /* el dorado va solo en cada letra: si estuviera también acá, Safari pinta la frase entera desde el principio */
   color: transparent;
   -webkit-text-fill-color: transparent;
 }
@@ -574,6 +572,7 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   padding: .6em .3em;
   margin: -.6em -.3em;
   opacity: 0;
+  visibility: hidden;
   /* cada letra lleva su parte del mismo degradado dorado (la posición la fija el JS) */
   background-image: var(--oro-texto);
   background-repeat: no-repeat;
@@ -583,7 +582,7 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   -webkit-text-fill-color: transparent;
 }
 /* La tinta aparece de izquierda a derecha, al ritmo de la pluma */
-.card-escrito .letra.v { opacity: 1; animation: tinta var(--d, 75ms) linear both; }
+.card-escrito .letra.v { opacity: 1; visibility: visible; animation: tinta var(--d, 75ms) linear both; }
 @keyframes tinta {
   from { clip-path: inset(0 100% 0 0); }
   to { clip-path: inset(0 0 0 0); }
