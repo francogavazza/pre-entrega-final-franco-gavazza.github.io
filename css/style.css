@@ -668,6 +668,6 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
-.flor-arco svg { display: block; width: 100%; height: 100%; }
-.hoja-arco { z-index: 1; width: 24px; height: 12px; opacity: .95; }
+.flor-arco svg, .flor-arco img { display: block; width: 100%; height: 100%; }
+.hoja-arco { z-index: 1; width: 30px; height: 13px; }
 .pimpollo { z-index: 1; }
