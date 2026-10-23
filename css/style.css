@@ -304,10 +304,6 @@ input[type="text"]::placeholder { color: #C4AA78; }
 .submit { display: grid; justify-items: center; gap: 12px; }
 .status { font-size: 20px; min-height: 1.3em; color: var(--muted); text-align: center; }
 .status.err { color: #8E2A2A; }
-.done { display: none; gap: 6px; text-align: center; padding-top: 4px; }
-.done.show { display: grid; }
-.done strong { font-style: italic; font-size: 28px; font-weight: 500; color: var(--wine-2); }
-.done p { color: var(--muted); font-size: 21px; }
 
 /* Luna de miel (tarjeta bordó) */
 .gift { background: transparent; box-shadow: none; }
@@ -413,7 +409,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
   --oro-texto: linear-gradient(100deg, #7A5A0E 0%, #A8801C 30%, #C9A23A 50%, #A8801C 70%, #7A5A0E 100%);
 }
 .monogram, .kicker-big, .title, .countdown b, .timeline .when, .timeline .evento h3,
-.rsvp-event, .done strong, #guest-names, .stepper output {
+.rsvp-event, #guest-names, .stepper output {
   background-image: var(--oro);
   background-size: 220% 100%;
   background-position: 0% 0;
@@ -424,7 +420,7 @@ footer p { color: var(--cream-2); font-size: 22px; opacity: 1; }
 }
 .monogram, .kicker-big, .title { animation: oro-destello 7s ease-in-out infinite; }
 .kicker-big.write.go { animation: pen-write 2.2s linear 3.7s forwards, oro-destello 7s ease-in-out infinite; }
-.lead, .gift .v, .timeline .evento p, .timeline .fecha, .timeline .when small, .countdown span, .caps, .gift .k, .rsvp-event span, .done p, .hint, .tally,
+.lead, .gift .v, .timeline .evento p, .timeline .fecha, .timeline .when small, .countdown span, .caps, .gift .k, .rsvp-event span, .hint, .tally,
 .field > label, .field > .lbl, footer p, blockquote, figcaption, .gift a, #send, .answer-opts span, .btn {
   background-image: var(--oro-texto);
   -webkit-background-clip: text;
