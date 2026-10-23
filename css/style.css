@@ -646,3 +646,14 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   filter: drop-shadow(0 1px 1px rgba(40, 60, 90, .25));
 }
 .pluma-pajaro svg { display: block; width: 100%; height: 100%; }
+
+/* Títulos de sección en mayúsculas ("CONFIRMAR ASISTENCIA", "REGALOS", "CEREMONIA Y CENA") */
+.title, .rsvp-event {
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-variant-numeric: lining-nums;
+  text-wrap: balance;
+}
+.title { font-size: clamp(26px, 7vw, 34px); font-weight: 600; line-height: 1.2; }
+.rsvp-event { font-size: 20px; }
