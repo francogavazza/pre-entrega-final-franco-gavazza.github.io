@@ -778,4 +778,77 @@
   }
   bird.addEventListener("click", explotar);
 
+  // ===== Flores blancas alrededor del arco del cronograma =====
+  // Se dibujan sobre el borde del arco (semicírculo arriba y lados rectos), más tupidas en la
+  // corona y en las esquinas de abajo. Se rearman si cambia el ancho de la pantalla.
+  var arco = document.querySelector(".timeline");
+  function florSVG(t) {
+    // flor blanca de cinco pétalos con sombra suave y centro dorado
+    var p = "";
+    for (var i = 0; i < 5; i++) {
+      p += '<ellipse cx="20" cy="10.5" rx="6.6" ry="9.2" transform="rotate(' + (i * 72 + t) + ' 20 20)"/>';
+    }
+    return '<svg viewBox="0 0 40 40"><g fill="url(#petalo)" stroke="#D9D2C6" stroke-width=".6">' + p + '</g>' +
+      '<circle cx="20" cy="20" r="4.2" fill="#E9CF7A"/><g fill="#B8902F">' +
+      '<circle cx="18.6" cy="18.8" r=".9"/><circle cx="21.4" cy="19" r=".9"/><circle cx="20" cy="21.6" r=".9"/></g></svg>';
+  }
+  function hojaSVG() {
+    return '<svg viewBox="0 0 40 20"><path d="M1 10 C10 0 30 0 39 10 C30 20 10 20 1 10 Z" fill="#9DB096" stroke="#7E9478" stroke-width=".6"/>' +
+      '<path d="M2 10 L37 10" stroke="#7E9478" stroke-width=".6"/></svg>';
+  }
+  function armarGuirnalda() {
+    if (!arco) return;
+    var viejas = arco.querySelectorAll(".flor-arco");
+    for (var v = 0; v < viejas.length; v++) viejas[v].remove();
+    var w = arco.offsetWidth, h = arco.offsetHeight, r = w / 2;
+    var izq = h - r, arcoLargo = Math.PI * r, total = izq * 2 + arcoLargo;
+    // punto del borde a una distancia s, recorriendo desde abajo a la izquierda
+    function punto(s) {
+      if (s < izq) return { x: 0, y: h - s, ang: -90 };
+      s -= izq;
+      if (s < arcoLargo) { var a = Math.PI - s / r; return { x: r + Math.cos(a) * r, y: r - Math.sin(a) * r, ang: -a * 180 / Math.PI }; }
+      s -= arcoLargo;
+      return { x: w, y: r + s, ang: 90 };
+    }
+    // cuánto se amontonan las flores según la zona: corona y esquinas de abajo
+    function densidad(s) {
+      var u = s / total, corona = Math.exp(-Math.pow((u - .5) / .09, 2)), esquinas = Math.exp(-Math.pow(u / .07, 2)) + Math.exp(-Math.pow((1 - u) / .07, 2));
+      return .32 + corona * 1.3 + esquinas * 1.1;
+    }
+    var s = 0, i = 0, semilla = 7;
+    function rnd() { semilla = (semilla * 9301 + 49297) % 233280; return semilla / 233280; }
+    while (s < total) {
+      var d = densidad(s), pt = punto(s);
+      var hoja = document.createElement("span");
+      hoja.className = "flor-arco hoja-arco";
+      hoja.innerHTML = hojaSVG();
+      var lado = i % 2 ? 1 : -1;
+      hoja.style.cssText = "left:" + pt.x + "px;top:" + pt.y + "px;transform:translate(-50%,-50%) rotate(" + (pt.ang + 90 + lado * (30 + rnd() * 30)) + "deg) translateX(" + (10 + rnd() * 6) + "px)";
+      arco.appendChild(hoja);
+      if (rnd() < Math.min(1, d * 1.2)) {
+        var tam = 15 + rnd() * 12 + Math.min(d, 1.3) * 8;
+        var flor = document.createElement("span");
+        flor.className = "flor-arco";
+        flor.innerHTML = florSVG(rnd() * 72);
+        flor.style.cssText = "left:" + (pt.x + (rnd() - .5) * 8) + "px;top:" + (pt.y + (rnd() - .5) * 8) + "px;width:" + tam + "px;height:" + tam + "px";
+        arco.appendChild(flor);
+      } else {
+        // pimpollo chiquito
+        var pim = document.createElement("span");
+        pim.className = "flor-arco pimpollo";
+        pim.innerHTML = florSVG(rnd() * 72);
+        pim.style.cssText = "left:" + (pt.x + (rnd() - .5) * 10) + "px;top:" + (pt.y + (rnd() - .5) * 10) + "px;width:10px;height:10px";
+        arco.appendChild(pim);
+      }
+      s += 15 / Math.max(.5, d);
+      i++;
+    }
+  }
+  if (arco) {
+    armarGuirnalda();
+    var anchoArco = arco.offsetWidth;
+    window.addEventListener("resize", function () { if (arco.offsetWidth !== anchoArco) { anchoArco = arco.offsetWidth; armarGuirnalda(); } });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(armarGuirnalda);
+  }
+
 })();
