@@ -181,14 +181,26 @@
   }
 
   // ===== Cuenta regresiva (días y horas), se actualiza cada minuto =====
+  // Cuenta regresiva (días, horas y minutos). Revisa cada segundo, pero cada número cambia
+  // solo cuando corresponde, con un pequeño salto para que se note que el relojito avanza.
+  function poner(id, valor) {
+    var el = $(id);
+    var txt = String(valor);
+    if (el.textContent === txt) return;
+    el.textContent = txt;
+    el.classList.remove("cambia");
+    void el.offsetWidth;
+    el.classList.add("cambia");
+  }
   function tick() {
     var ms = TARGET - new Date();
-    if (ms <= 0) return;
-    $("cd-d").textContent = Math.floor(ms / 86400000);
-    $("cd-h").textContent = Math.floor((ms % 86400000) / 3600000);
+    if (ms <= 0) { poner("cd-d", 0); poner("cd-h", 0); poner("cd-m", "00"); return; }
+    poner("cd-d", Math.floor(ms / 86400000));
+    poner("cd-h", Math.floor((ms % 86400000) / 3600000));
+    poner("cd-m", String(Math.floor((ms % 3600000) / 60000)).padStart(2, "0"));
   }
   tick();
-  setInterval(tick, 60000);
+  setInterval(tick, 1000);
 
   // ===== Copiar alias y CVU =====
   function copyText(btn, text, selectEl, okLabel) {

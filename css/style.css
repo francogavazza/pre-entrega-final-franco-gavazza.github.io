@@ -610,3 +610,13 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 /* Dentro del sobre los pétalos quedan detrás de la tarjeta */
 .door .petalos { z-index: 0; }
 .door .env { z-index: 1; }
+
+/* Cuenta regresiva: cada número da un pequeño salto cuando cambia */
+.countdown b { display: inline-block; }
+.countdown b.cambia { animation: reloj-salta .6s ease; }
+@keyframes reloj-salta {
+  0% { transform: translateY(-35%); opacity: 0; }
+  60% { transform: translateY(6%); opacity: 1; }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .countdown b.cambia { animation: none; } }
