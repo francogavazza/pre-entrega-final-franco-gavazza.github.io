@@ -813,16 +813,14 @@
       arco.appendChild(el);
     }
     var s = 8, i = 0, mitad = total / 2;
-    // lirios reales (fotos recortadas): el de frente gira libre; los de perfil miran hacia afuera del arco
-    var lirios = ["lirio1", "lirio2", "lirio3"];
+    // flor blanca real (foto recortada); cada una gira distinto para que no se vean iguales
     while (s <= mitad) {
       var d = densidad(s), pt = punto(s), espejo = punto(total - s);
-      var esCentro = mitad - s < 12;  // el lirio de arriba de todo va una sola vez
-      var tipo = esCentro ? "lirio1" : lirios[i % 3];
-      var tam = (esCentro ? 50 : 34 + rnd() * 10 + Math.min(d, 1.2) * 6);
-      var rot = tipo === "lirio1" ? rnd() * 360 : pt.ang + (rnd() - .5) * 30;
-      var html = '<img src="./assets/boda/' + tipo + '.png" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">';
-      var html2 = '<img src="./assets/boda/' + tipo + '.png" alt="" style="transform:scaleX(-1) rotate(' + (-rot).toFixed(1) + 'deg)">';
+      var esCentro = mitad - s < 12;  // la flor de arriba de todo va una sola vez
+      var tam = (esCentro ? 50 : 32 + rnd() * 10 + Math.min(d, 1.2) * 6);
+      var rot = rnd() * 360;
+      var html = '<img src="./assets/boda/flor-blanca.png" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">';
+      var html2 = '<img src="./assets/boda/flor-blanca.png" alt="" style="transform:scaleX(-1) rotate(' + (-rot).toFixed(1) + 'deg)">';
       poner("lirio", html, pt.x, pt.y, tam, null);
       if (!esCentro) poner("lirio", html2, espejo.x, espejo.y, tam, null);
       s += 46 / Math.max(.6, d);

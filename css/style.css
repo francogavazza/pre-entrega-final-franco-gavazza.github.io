@@ -669,4 +669,4 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
   pointer-events: none;
 }
 .flor-arco svg, .flor-arco img { display: block; width: 100%; height: 100%; }
-.flor-arco.lirio { filter: drop-shadow(0 2px 2px rgba(80, 60, 30, .18)); }
+.flor-arco.lirio { filter: drop-shadow(0 1px 1.5px rgba(150, 120, 60, .2)); }
