@@ -796,14 +796,8 @@
       s -= arcoLargo;
       return { x: w, y: r + s, ang: 90 };
     }
-    // cuánto se amontonan las flores según la zona: corona y esquinas de abajo
-    function densidad(s) {
-      var u = s / total, corona = Math.exp(-Math.pow((u - .5) / .09, 2)), esquinas = Math.exp(-Math.pow(u / .07, 2)) + Math.exp(-Math.pow((1 - u) / .07, 2));
-      return .45 + corona * .55 + esquinas * .45;
-    }
     var semilla = 7;
     function rnd() { semilla = (semilla * 9301 + 49297) % 233280; return semilla / 233280; }
-    // Se arma la mitad izquierda y se copia en espejo a la derecha, así el arco queda parejo
     function poner(clase, html, x, y, tam, giro) {
       var el = document.createElement("span");
       el.className = "flor-arco" + (clase ? " " + clase : "");
@@ -812,20 +806,13 @@
         (giro !== null ? ";transform:translate(-50%,-50%) rotate(" + giro + "deg) translateX(12px)" : "");
       arco.appendChild(el);
     }
-    var s = 8, i = 0, mitad = total / 2;
-    // flor blanca real (foto recortada); cada una gira distinto para que no se vean iguales
-    while (s <= mitad) {
-      var d = densidad(s), pt = punto(s), espejo = punto(total - s);
-      var esCentro = mitad - s < 12;  // la flor de arriba de todo va una sola vez
-      var tam = (esCentro ? 50 : 32 + rnd() * 10 + Math.min(d, 1.2) * 6);
-      var rot = rnd() * 360;
-      var html = '<img src="./assets/boda/flor-blanca.png" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">';
-      var html2 = '<img src="./assets/boda/flor-blanca.png" alt="" style="transform:scaleX(-1) rotate(' + (-rot).toFixed(1) + 'deg)">';
-      poner("lirio", html, pt.x, pt.y, tam, null);
-      if (!esCentro) poner("lirio", html2, espejo.x, espejo.y, tam, null);
-      s += 46 / Math.max(.6, d);
-      i++;
-    }
+    // solo tres flores blancas arriba de todo: una grande al centro y dos a los costados, en espejo
+    var mitad = total / 2, rot = rnd() * 360, img = './assets/boda/flor-blanca.png';
+    var c = punto(mitad), lado = punto(mitad - 46), espejo = punto(mitad + 46);
+    poner("lirio", '<img src="' + img + '" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">', c.x, c.y, 54, null);
+    rot = rnd() * 360;
+    poner("lirio", '<img src="' + img + '" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">', lado.x, lado.y, 40, null);
+    poner("lirio", '<img src="' + img + '" alt="" style="transform:scaleX(-1) rotate(' + (-rot).toFixed(1) + 'deg)">', espejo.x, espejo.y, 40, null);
   }
   if (arco) {
     armarGuirnalda();
