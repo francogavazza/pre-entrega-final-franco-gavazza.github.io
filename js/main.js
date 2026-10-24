@@ -782,13 +782,6 @@
   // Se dibujan sobre el borde del arco (semicírculo arriba y lados rectos), más tupidas en la
   // corona y en las esquinas de abajo. Se rearman si cambia el ancho de la pantalla.
   var arco = document.querySelector(".timeline");
-  // Las flores y hojas son imágenes dibujadas una sola vez (rosas blancas, jazmines y hojas con nervaduras)
-  function florSVG(t, tipo) {
-    return '<img src="./assets/boda/' + tipo + '.svg" alt="" style="transform:rotate(' + t + 'deg)">';
-  }
-  function hojaSVG() {
-    return '<img src="./assets/boda/hoja.svg" alt="">';
-  }
   function armarGuirnalda() {
     if (!arco) return;
     var viejas = arco.querySelectorAll(".flor-arco");
@@ -819,22 +812,20 @@
         (giro !== null ? ";transform:translate(-50%,-50%) rotate(" + giro + "deg) translateX(12px)" : "");
       arco.appendChild(el);
     }
-    var s = 6, i = 0, mitad = total / 2;
+    var s = 8, i = 0, mitad = total / 2;
+    // lirios reales (fotos recortadas): el de frente gira libre; los de perfil miran hacia afuera del arco
+    var lirios = ["lirio1", "lirio2", "lirio3"];
     while (s <= mitad) {
       var d = densidad(s), pt = punto(s), espejo = punto(total - s);
-      var esCentro = mitad - s < 10;  // la flor de arriba de todo va una sola vez
-      if (rnd() < .5) {
-        var g = pt.ang + 90 + (i % 2 ? 1 : -1) * (35 + rnd() * 25);
-        poner("hoja-arco", hojaSVG(), pt.x, pt.y, 0, g);
-        if (!esCentro) poner("hoja-arco", hojaSVG(), espejo.x, espejo.y, 0, 180 - g);
-      }
-      var grande = rnd() < Math.min(.85, d);
-      var tam = grande ? 20 + rnd() * 10 + Math.min(d, 1.2) * 6 : 13;
-      var tipo = grande && rnd() < .6 ? "rosa" : "jazmin";
-      var rot = rnd() * 360;
-      poner(grande ? "" : "pimpollo", florSVG(rot, tipo), pt.x, pt.y, tam, null);
-      if (!esCentro) poner(grande ? "" : "pimpollo", florSVG(-rot, tipo), espejo.x, espejo.y, tam, null);
-      s += 30 / Math.max(.6, d);
+      var esCentro = mitad - s < 12;  // el lirio de arriba de todo va una sola vez
+      var tipo = esCentro ? "lirio1" : lirios[i % 3];
+      var tam = (esCentro ? 50 : 34 + rnd() * 10 + Math.min(d, 1.2) * 6);
+      var rot = tipo === "lirio1" ? rnd() * 360 : pt.ang + (rnd() - .5) * 30;
+      var html = '<img src="./assets/boda/' + tipo + '.png" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">';
+      var html2 = '<img src="./assets/boda/' + tipo + '.png" alt="" style="transform:scaleX(-1) rotate(' + (-rot).toFixed(1) + 'deg)">';
+      poner("lirio", html, pt.x, pt.y, tam, null);
+      if (!esCentro) poner("lirio", html2, espejo.x, espejo.y, tam, null);
+      s += 46 / Math.max(.6, d);
       i++;
     }
   }
