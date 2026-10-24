@@ -806,37 +806,35 @@
     // cuánto se amontonan las flores según la zona: corona y esquinas de abajo
     function densidad(s) {
       var u = s / total, corona = Math.exp(-Math.pow((u - .5) / .09, 2)), esquinas = Math.exp(-Math.pow(u / .07, 2)) + Math.exp(-Math.pow((1 - u) / .07, 2));
-      return .32 + corona * 1.3 + esquinas * 1.1;
+      return .45 + corona * .55 + esquinas * .45;
     }
-    var s = 0, i = 0, semilla = 7;
+    var semilla = 7;
     function rnd() { semilla = (semilla * 9301 + 49297) % 233280; return semilla / 233280; }
-    while (s < total) {
-      var d = densidad(s), pt = punto(s);
-      var lado = i % 2 ? 1 : -1;
-      var conHoja = rnd() < .45;  // menos hojas: más o menos una cada dos flores
-      if (conHoja) {
-        var hoja = document.createElement("span");
-        hoja.className = "flor-arco hoja-arco";
-        hoja.innerHTML = hojaSVG();
-        hoja.style.cssText = "left:" + pt.x + "px;top:" + pt.y + "px;transform:translate(-50%,-50%) rotate(" + (pt.ang + 90 + lado * (30 + rnd() * 30)) + "deg) translateX(" + (10 + rnd() * 6) + "px)";
-        arco.appendChild(hoja);
+    // Se arma la mitad izquierda y se copia en espejo a la derecha, así el arco queda parejo
+    function poner(clase, html, x, y, tam, giro) {
+      var el = document.createElement("span");
+      el.className = "flor-arco" + (clase ? " " + clase : "");
+      el.innerHTML = html;
+      el.style.cssText = "left:" + x + "px;top:" + y + "px" + (tam ? ";width:" + tam + "px;height:" + tam + "px" : "") +
+        (giro !== null ? ";transform:translate(-50%,-50%) rotate(" + giro + "deg) translateX(12px)" : "");
+      arco.appendChild(el);
+    }
+    var s = 6, i = 0, mitad = total / 2;
+    while (s <= mitad) {
+      var d = densidad(s), pt = punto(s), espejo = punto(total - s);
+      var esCentro = mitad - s < 10;  // la flor de arriba de todo va una sola vez
+      if (rnd() < .5) {
+        var g = pt.ang + 90 + (i % 2 ? 1 : -1) * (35 + rnd() * 25);
+        poner("hoja-arco", hojaSVG(), pt.x, pt.y, 0, g);
+        if (!esCentro) poner("hoja-arco", hojaSVG(), espejo.x, espejo.y, 0, 180 - g);
       }
-      if (rnd() < Math.min(1, d * 1.2)) {
-        var tam = 18 + rnd() * 14 + Math.min(d, 1.3) * 9;
-        var flor = document.createElement("span");
-        flor.className = "flor-arco";
-        flor.innerHTML = florSVG(rnd() * 360, rnd() < .6 ? "rosa" : "jazmin");
-        flor.style.cssText = "left:" + (pt.x + (rnd() - .5) * 8) + "px;top:" + (pt.y + (rnd() - .5) * 8) + "px;width:" + tam + "px;height:" + tam + "px";
-        arco.appendChild(flor);
-      } else {
-        // pimpollo chiquito
-        var pim = document.createElement("span");
-        pim.className = "flor-arco pimpollo";
-        pim.innerHTML = florSVG(rnd() * 360, "jazmin");
-        pim.style.cssText = "left:" + (pt.x + (rnd() - .5) * 10) + "px;top:" + (pt.y + (rnd() - .5) * 10) + "px;width:13px;height:13px";
-        arco.appendChild(pim);
-      }
-      s += 15 / Math.max(.5, d);
+      var grande = rnd() < Math.min(.85, d);
+      var tam = grande ? 20 + rnd() * 10 + Math.min(d, 1.2) * 6 : 13;
+      var tipo = grande && rnd() < .6 ? "rosa" : "jazmin";
+      var rot = rnd() * 360;
+      poner(grande ? "" : "pimpollo", florSVG(rot, tipo), pt.x, pt.y, tam, null);
+      if (!esCentro) poner(grande ? "" : "pimpollo", florSVG(-rot, tipo), espejo.x, espejo.y, tam, null);
+      s += 30 / Math.max(.6, d);
       i++;
     }
   }
