@@ -782,37 +782,101 @@
   // Se dibujan sobre el borde del arco (semicírculo arriba y lados rectos), más tupidas en la
   // corona y en las esquinas de abajo. Se rearman si cambia el ancho de la pantalla.
   var arco = document.querySelector(".timeline");
+  // Enredadera dorada que abraza el arco: una ramita que se enrosca en la línea,
+  // con hojitas, florcitas doradas y perlitas, agrupadas en ramilletes como un marco de bronce.
   function armarGuirnalda() {
     if (!arco) return;
-    var viejas = arco.querySelectorAll(".flor-arco");
-    for (var v = 0; v < viejas.length; v++) viejas[v].remove();
+    var vieja = arco.querySelector(".enredadera");
+    if (vieja) vieja.remove();
     var w = arco.offsetWidth, h = arco.offsetHeight, r = w / 2;
     var izq = h - r, arcoLargo = Math.PI * r, total = izq * 2 + arcoLargo;
     // punto del borde a una distancia s, recorriendo desde abajo a la izquierda
-    function punto(s) {
-      if (s < izq) return { x: 0, y: h - s, ang: -90 };
+    function borde(s) {
+      if (s < izq) return { x: .5, y: h - s };
       s -= izq;
-      if (s < arcoLargo) { var a = Math.PI - s / r; return { x: r + Math.cos(a) * r, y: r - Math.sin(a) * r, ang: -a * 180 / Math.PI }; }
+      if (s < arcoLargo) { var a = Math.PI - s / r; return { x: r + Math.cos(a) * (r - .5), y: r - Math.sin(a) * (r - .5) }; }
       s -= arcoLargo;
-      return { x: w, y: r + s, ang: 90 };
+      return { x: w - .5, y: r + s };
     }
-    var semilla = 7;
+    // punto desplazado hacia afuera (d > 0) o hacia adentro (d < 0), con la dirección del recorrido
+    function punto(s, d) {
+      var p = borde(s), p1 = borde(Math.max(0, s - 1)), p2 = borde(Math.min(total, s + 1));
+      var tx = p2.x - p1.x, ty = p2.y - p1.y, l = Math.hypot(tx, ty) || 1;
+      tx /= l; ty /= l;
+      return { x: p.x + ty * d, y: p.y - tx * d, ang: Math.atan2(ty, tx) * 180 / Math.PI };
+    }
+    var semilla = 11;
     function rnd() { semilla = (semilla * 9301 + 49297) % 233280; return semilla / 233280; }
-    function poner(clase, html, x, y, tam, giro) {
-      var el = document.createElement("span");
-      el.className = "flor-arco" + (clase ? " " + clase : "");
-      el.innerHTML = html;
-      el.style.cssText = "left:" + x + "px;top:" + y + "px" + (tam ? ";width:" + tam + "px;height:" + tam + "px" : "") +
-        (giro !== null ? ";transform:translate(-50%,-50%) rotate(" + giro + "deg) translateX(12px)" : "");
-      arco.appendChild(el);
+    function f(n) { return n.toFixed(1); }
+    // la ramita se enrosca: va y viene cruzando la línea del arco
+    function vaiven(s) { return Math.sin(s / 26) * 4.5 + Math.sin(s / 9) * 1.2; }
+
+    var svg = '<defs>' +
+      '<linearGradient id="enr-oro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7A5A16"/><stop offset=".4" stop-color="#E9CC72"/><stop offset=".6" stop-color="#C9A23A"/><stop offset="1" stop-color="#8A6619"/></linearGradient>' +
+      '<linearGradient id="enr-hoja" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D98C"/><stop offset=".5" stop-color="#C9A23A"/><stop offset="1" stop-color="#8A6619"/></linearGradient>' +
+      '<radialGradient id="enr-perla" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#F3EBDD"/><stop offset="1" stop-color="#C9B48A"/></radialGradient>' +
+      '</defs>';
+
+    // la ramita principal, una sola línea fina que recorre todo el arco
+    var d = "", paso = 3;
+    for (var s = 4; s <= total - 4; s += paso) {
+      var p = punto(s, vaiven(s));
+      d += (d ? " L" : "M") + f(p.x) + " " + f(p.y);
     }
-    // solo tres flores blancas arriba de todo: una grande al centro y dos a los costados, en espejo
-    var mitad = total / 2, rot = rnd() * 360, img = './assets/boda/flor-blanca.png';
-    var c = punto(mitad), lado = punto(mitad - 46), espejo = punto(mitad + 46);
-    poner("lirio", '<img src="' + img + '" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">', c.x, c.y, 54, null);
-    rot = rnd() * 360;
-    poner("lirio", '<img src="' + img + '" alt="" style="transform:rotate(' + rot.toFixed(1) + 'deg)">', lado.x, lado.y, 40, null);
-    poner("lirio", '<img src="' + img + '" alt="" style="transform:scaleX(-1) rotate(' + (-rot).toFixed(1) + 'deg)">', espejo.x, espejo.y, 40, null);
+    svg += '<path d="' + d + '" fill="none" stroke="url(#enr-oro)" stroke-width="1.4" stroke-linecap="round"/>';
+    // una segunda ramita más finita que se enrosca al revés, como en un marco de bronce
+    d = "";
+    for (var s3 = 10; s3 <= total - 10; s3 += paso) {
+      var q = punto(s3, -vaiven(s3 + 40) * .9);
+      d += (d ? " L" : "M") + f(q.x) + " " + f(q.y);
+    }
+    svg += '<path d="' + d + '" fill="none" stroke="url(#enr-oro)" stroke-width=".8" stroke-linecap="round" opacity=".85"/>';
+
+    function hoja(s, lado, largo) {
+      var p = punto(s, vaiven(s)), giro = p.ang + lado * (35 + rnd() * 30) + (rnd() < .5 ? 0 : 180) * 0;
+      // mayormente hacia afuera del arco, para no tapar las letras
+      if (lado < 0 && rnd() < .7) giro = p.ang - (40 + rnd() * 35);
+      var e = largo / 18;
+      return '<g transform="translate(' + f(p.x) + ',' + f(p.y) + ') rotate(' + f(giro) + ') scale(' + e.toFixed(2) + ')">' +
+        '<path d="M0 0 C4 -5.5 12 -6.5 18 0 C12 5 4 4.5 0 0Z" fill="url(#enr-hoja)" stroke="#8A6619" stroke-width=".4"/>' +
+        '<path d="M1 0 Q9 -1 16.5 0" fill="none" stroke="#7A5A16" stroke-width=".55" opacity=".8"/></g>';
+    }
+    function flor(s, tam) {
+      var p = punto(s, vaiven(s) + 2), g = rnd() * 72, out = '<g transform="translate(' + f(p.x) + ',' + f(p.y) + ') rotate(' + f(g) + ') scale(' + (tam / 10).toFixed(2) + ')">';
+      for (var k = 0; k < 5; k++) out += '<path transform="rotate(' + (k * 72) + ')" d="M0 0 C-3.2 -2.5 -3.4 -8 0 -9.5 C3.4 -8 3.2 -2.5 0 0Z" fill="url(#enr-hoja)" stroke="#7A5A16" stroke-width=".45"/>';
+      return out + '<circle r="2.2" fill="#7A5A16"/><circle r="1.1" cx="-.5" cy="-.5" fill="#E9CC72"/></g>';
+    }
+    function perla(s, lejos) {
+      var b = punto(s, vaiven(s)), p = punto(s + 3, vaiven(s) + lejos);
+      return '<path d="M' + f(b.x) + ' ' + f(b.y) + ' Q' + f((b.x + p.x) / 2 + 2) + ' ' + f((b.y + p.y) / 2) + ' ' + f(p.x) + ' ' + f(p.y) + '" fill="none" stroke="url(#enr-oro)" stroke-width=".8"/>' +
+        '<circle cx="' + f(p.x) + '" cy="' + f(p.y) + '" r="2.3" fill="url(#enr-perla)" stroke="#B8902E" stroke-width=".6"/>';
+    }
+    function rulo(s) {
+      var p = punto(s, vaiven(s)), giro = p.ang - 60;
+      return '<path transform="translate(' + f(p.x) + ',' + f(p.y) + ') rotate(' + f(giro) + ')" d="M0 0 C6 -1 11 -5 10 -9 C9 -12 5 -11 6 -8" fill="none" stroke="url(#enr-oro)" stroke-width=".9" stroke-linecap="round"/>';
+    }
+
+    // hojitas sueltas a lo largo de toda la rama
+    var i = 0;
+    for (var s2 = 20; s2 < total - 20; s2 += 30 + rnd() * 14) { svg += hoja(s2, i % 2 ? 1 : -1, 13 + rnd() * 4); i++; }
+    // ramilletes: en algunos puntos, como en el marco, con más hojas, una flor y perlitas
+    var ramilletes = [.1, .27, .43, .6, .76, .93];
+    for (var j = 0; j < ramilletes.length; j++) {
+      var c = ramilletes[j] * total;
+      for (var k = -3; k <= 3; k++) if (k) svg += hoja(c + k * 7 + (rnd() - .5) * 3, k % 2 ? 1 : -1, 16 + rnd() * 6 - Math.abs(k));
+      svg += rulo(c + 18);
+      svg += perla(c - 13, 9);
+      if (j % 2 === 0) svg += perla(c + 11, 8);
+      svg += flor(c, 11 + rnd() * 2);
+    }
+
+    var el = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    el.setAttribute("class", "enredadera");
+    el.setAttribute("width", w);
+    el.setAttribute("height", h);
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = svg;
+    arco.appendChild(el);
   }
   if (arco) {
     armarGuirnalda();
