@@ -812,8 +812,9 @@
     function vaiven(s) { return Math.sin(s / 26) * 4.5 + Math.sin(s / 9) * 1.2; }
 
     var svg = '<defs>' +
-      '<linearGradient id="enr-oro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7A5A16"/><stop offset=".4" stop-color="#E9CC72"/><stop offset=".6" stop-color="#C9A23A"/><stop offset="1" stop-color="#8A6619"/></linearGradient>' +
-      '<linearGradient id="enr-hoja" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D98C"/><stop offset=".5" stop-color="#C9A23A"/><stop offset="1" stop-color="#8A6619"/></linearGradient>' +
+      // los mismos tonos de oro que las letras (--oro en el CSS)
+      '<linearGradient id="enr-oro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A8801C"/><stop offset=".2" stop-color="#C9A23A"/><stop offset=".35" stop-color="#EFD27C"/><stop offset=".5" stop-color="#D4AF37"/><stop offset=".65" stop-color="#B8902A"/><stop offset=".8" stop-color="#EBCB6B"/><stop offset="1" stop-color="#C9A23A"/></linearGradient>' +
+      '<linearGradient id="enr-hoja" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3DA88"/><stop offset=".35" stop-color="#EBCB6B"/><stop offset=".6" stop-color="#D4AF37"/><stop offset="1" stop-color="#B08A24"/></linearGradient>' +
       '<radialGradient id="enr-perla" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#F3EBDD"/><stop offset="1" stop-color="#C9B48A"/></radialGradient>' +
       '</defs>';
 
@@ -838,18 +839,18 @@
       if (lado < 0 && rnd() < .7) giro = p.ang - (40 + rnd() * 35);
       var e = largo / 18;
       return '<g transform="translate(' + f(p.x) + ',' + f(p.y) + ') rotate(' + f(giro) + ') scale(' + e.toFixed(2) + ')">' +
-        '<path d="M0 0 C4 -5.5 12 -6.5 18 0 C12 5 4 4.5 0 0Z" fill="url(#enr-hoja)" stroke="#8A6619" stroke-width=".4"/>' +
-        '<path d="M1 0 Q9 -1 16.5 0" fill="none" stroke="#7A5A16" stroke-width=".55" opacity=".8"/></g>';
+        '<path d="M0 0 C4 -5.5 12 -6.5 18 0 C12 5 4 4.5 0 0Z" fill="url(#enr-hoja)" stroke="#B8902A" stroke-width=".35"/>' +
+        '<path d="M1 0 Q9 -1 16.5 0" fill="none" stroke="#A8801C" stroke-width=".5" opacity=".7"/></g>';
     }
     function flor(s, tam) {
       var p = punto(s, vaiven(s) + 2), g = rnd() * 72, out = '<g transform="translate(' + f(p.x) + ',' + f(p.y) + ') rotate(' + f(g) + ') scale(' + (tam / 10).toFixed(2) + ')">';
-      for (var k = 0; k < 5; k++) out += '<path transform="rotate(' + (k * 72) + ')" d="M0 0 C-3.2 -2.5 -3.4 -8 0 -9.5 C3.4 -8 3.2 -2.5 0 0Z" fill="url(#enr-hoja)" stroke="#7A5A16" stroke-width=".45"/>';
-      return out + '<circle r="2.2" fill="#7A5A16"/><circle r="1.1" cx="-.5" cy="-.5" fill="#E9CC72"/></g>';
+      for (var k = 0; k < 5; k++) out += '<path transform="rotate(' + (k * 72) + ')" d="M0 0 C-3.2 -2.5 -3.4 -8 0 -9.5 C3.4 -8 3.2 -2.5 0 0Z" fill="url(#enr-hoja)" stroke="#B8902A" stroke-width=".4"/>';
+      return out + '<circle r="2.2" fill="#B08A24"/><circle r="1.2" cx="-.5" cy="-.5" fill="#F3DA88"/></g>';
     }
     function perla(s, lejos) {
       var b = punto(s, vaiven(s)), p = punto(s + 3, vaiven(s) + lejos);
       return '<path d="M' + f(b.x) + ' ' + f(b.y) + ' Q' + f((b.x + p.x) / 2 + 2) + ' ' + f((b.y + p.y) / 2) + ' ' + f(p.x) + ' ' + f(p.y) + '" fill="none" stroke="url(#enr-oro)" stroke-width=".8"/>' +
-        '<circle cx="' + f(p.x) + '" cy="' + f(p.y) + '" r="2.3" fill="url(#enr-perla)" stroke="#B8902E" stroke-width=".6"/>';
+        '<circle cx="' + f(p.x) + '" cy="' + f(p.y) + '" r="2.3" fill="url(#enr-perla)" stroke="#C9A23A" stroke-width=".6"/>';
     }
     function rulo(s) {
       var p = punto(s, vaiven(s)), giro = p.ang - 60;
