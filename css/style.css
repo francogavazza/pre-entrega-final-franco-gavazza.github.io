@@ -670,4 +670,4 @@ textarea#hogar, .answer-opts span, #send, #send::before, .gift .item { border-co
 }
 .flor-arco svg, .flor-arco img { display: block; width: 100%; height: 100%; }
 .flor-arco.lirio { filter: drop-shadow(0 1px 1.5px rgba(150, 120, 60, .2)); }
-.enredadera { position: absolute; left: -1px; top: -1px; z-index: 2; overflow: visible; pointer-events: none; filter: drop-shadow(0 1px 1px rgba(90, 65, 20, .25)); }
+.enredadera { position: absolute; left: -1px; top: -1px; z-index: 2; overflow: visible; pointer-events: none; filter: drop-shadow(0 1px .8px rgba(140, 105, 20, .18)); }
