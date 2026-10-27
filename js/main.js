@@ -312,6 +312,12 @@
       return id;
     } catch (e) { return "sin-id-" + Date.now().toString(36); }
   }
+  // Una fila por grupo: el mismo celular puede confirmar para varias familias sin pisarse;
+  // si el mismo grupo cambia su respuesta (mismo primer nombre), se actualiza su fila
+  function grupoId(names) {
+    var primero = names.split("\n")[0].trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return deviceId() + "-" + (primero || "sin-nombre");
+  }
   function sendToSheet(id, asiste, count) {
     if (!SHEET_URL) return Promise.resolve(false);
     var data = {
@@ -348,13 +354,17 @@
     var btn = $("send");
     btn.disabled = true;
     setStatus("Enviando…");
-    sendToSheet(deviceId(), asiste, count).then(function (ok) {
+    sendToSheet(grupoId(names), asiste, count).then(function (ok) {
       btn.disabled = false;
       if (ok) {
         setStatus("");
         showDone(count, asiste);
       } else {
-        setStatus("No se pudo enviar. Revisá la conexión e intentá de nuevo.", true);
+        // si la planilla no se puede alcanzar (por ejemplo, desde el link de Claude), la
+        // confirmación no se pierde: se manda por WhatsApp
+        setStatus("No se pudo anotar en la lista. Te abrimos WhatsApp para enviarnos la confirmación.", true);
+        showDone(count, asiste);
+        sendWhatsApp(asiste, count, names);
       }
     });
   }
