@@ -345,7 +345,7 @@
     var count = countPeople();
     var asiste = getAnswer();
     var names = $("hogar").value.trim();
-    try { localStorage.setItem("rsvp-fran-sofi", JSON.stringify({ hogar: names, asiste: asiste })); } catch (e) {}
+    try { localStorage.setItem("rsvp-fran-sofi", JSON.stringify({ hogar: names, asiste: asiste, id: grupoId(names), reenviado: Date.now() })); } catch (e) {}
     if (!SHEET_URL) {
       showDone(count, asiste);
       sendWhatsApp(asiste, count, names);
@@ -402,6 +402,18 @@
         $("hogar").value = saved.hogar;
         setAnswer(saved.asiste);
         showDone(countPeople(), saved.asiste);
+        // Si alguna confirmación no llegó a la planilla, se vuelve a mandar sola cuando el invitado
+        // abre otra vez la invitación (como mucho una vez cada 12 h). La planilla actualiza la misma
+        // fila, así que si ya estaba no se duplica. Las guardadas antes usaban solo el id del celular.
+        if (SHEET_URL && !(saved.reenviado > Date.now() - 12 * 3600 * 1000)) {
+          setTimeout(function () {
+            sendToSheet(saved.id || deviceId(), saved.asiste, countPeople()).then(function (ok) {
+              if (!ok) return;
+              saved.reenviado = Date.now();
+              try { localStorage.setItem("rsvp-fran-sofi", JSON.stringify(saved)); } catch (e) {}
+            });
+          }, 2000);
+        }
       }
     } catch (e) {}
   }
