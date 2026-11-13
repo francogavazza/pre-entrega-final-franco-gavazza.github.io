@@ -251,9 +251,9 @@
     s.className = "status" + (isErr ? " err" : "");
   }
 
-  // Al enviar, el botón pasa a "Cambiar respuesta" (sin cartel de confirmación)
+  // Al enviar, el botón pasa a "Confirmar respuesta" (sin cartel de confirmación)
   function showDone() {
-    $("send").textContent = "Cambiar respuesta";
+    $("send").textContent = "Confirmar respuesta";
   }
 
   function validate() {
